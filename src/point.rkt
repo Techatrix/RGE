@@ -27,7 +27,11 @@
     (define/public (get-con) connections)
     ; Draw
     (define/public (draw-point dc) (send dc draw-ellipse (send this get-pos-x) (send this get-pos-y) point-d point-d))
-    (define/public (draw-connection dc x y) (send dc draw-line (+ (send this get-pos-x) point-r) (+ (send this get-pos-y) point-r) (+ x point-r) (+ y point-r)))
+    (define/public (draw-connection dc x y)
+      ; (send dc draw-line (+ (send this get-pos-x) point-r) (+ (send this get-pos-y) point-r) (+ x point-r) (+ y point-r))
+      (draw-arrow dc (+ (send this get-pos-x) point-r) (+ (send this get-pos-y) point-r) (+ x point-r) (+ y point-r))
+
+      )
     ; Util
     (define/public (ishit x y) (< (dst-PtoP (send this get-pos-x) (send this get-pos-y) x y) point-r))
     (define/public (add-con c) (set! connections (append connections (list c))) this) ; TODO: check for redefinition
