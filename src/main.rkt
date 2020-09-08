@@ -37,9 +37,9 @@
 (define graph (new graph-class))
 
 ; Graph Points
-(send graph add-point-pc '(100 100) '((1 5) (2 3)))
-(send graph add-point-pc '(200 100) '((0 5)      ))
-(send graph add-point-pc '(400 200) '((0 3)      ))
+; (send graph add-point-pc '(100 100) '((1 5) (2 3)))
+; (send graph add-point-pc '(200 100) '((0 5)      ))
+; (send graph add-point-pc '(400 200) '((0 3)      ))
 
 (send graph set-point-i 0 (new point-class [id 0] [position '(100 100)] [connections '((1 5))]))
 
