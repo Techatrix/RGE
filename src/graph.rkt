@@ -1,5 +1,5 @@
 #lang racket
-(require "Point.rkt")
+(require "point.rkt")
 
 (provide graph%)
 
