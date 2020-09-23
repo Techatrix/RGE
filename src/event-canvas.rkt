@@ -18,4 +18,6 @@
     
     (define/override (on-char event)
       (key-event-callback event))
-    (super-new)))
+    
+    (super-new)
+    ))
