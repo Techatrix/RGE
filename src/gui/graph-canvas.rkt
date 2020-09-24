@@ -10,7 +10,7 @@
 
 
     (define graph (new graph-O0%))
-    (define graph-model '())
+    (define graph-model (list '() 'var1 'var2))
     
     (define/public (set-tool tool) ; TODO: check
       (set! tool-id tool))
@@ -20,9 +20,14 @@
 
     (define/override (on-event event)
       (let ([type (send event get-event-type)])
-        (cond [(eq? type 'left-down) (writeln "Mouse-down")]
+        (cond [(eq? type 'left-down) (writeln "Mouse-down")
+                                     (set! graph-model (send graph graph-add-node graph-model (list 0 0)))]
               [(eq? type 'left-up) (writeln "Mouse-up")]
               [(eq? type 'motion) (void)])))
+
+
+
+
     
     (define/override (on-char event)
       (writeln "Key-down"))
