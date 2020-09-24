@@ -8,8 +8,8 @@
 (struct graph ([points : (Listof node)]))
 
 ; Graph add/delete
-(: graph-add-node-O2 (-> graph node graph))
-(define (graph-add-node-O2 graph node) (error "No Implementation") graph)
+(: graph-add-node-O2 (-> graph point graph))
+(define (graph-add-node-O2 graph point) (error "No Implementation") graph)
 
 (: graph-delete-node-O2 (-> graph Integer graph))
 (define (graph-delete-node-O2 graph id) (error "No Implementation") graph)
@@ -68,6 +68,8 @@
 (: node-set-connection-O2 (-> node Integer connection node))
 (define (node-set-connection-O2 node id new-c) (error "No Implementation"))
 
+; Util
+(define (_graph-get-valid-id-O2 graph) 0)
 
 
 

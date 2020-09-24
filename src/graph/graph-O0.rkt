@@ -3,7 +3,10 @@
 (provide (all-defined-out))
 
 ; Graph
-(define (graph-add-node-O0 graph node) (error "No Implementation"))
+(define (graph-add-node-O0 graph point)
+  (define valid-id (_graph-get-valid-id-O0 graph))
+  (list (append (car graph) (list (list valid-id (car point) (cdr point)))) (rest graph)))
+
 (define (graph-delete-node-O0 graph id) (error "No Implementation"))
 
 ; Graph get
@@ -32,3 +35,16 @@
 ; Node get/set
 (define (node-get-connection-O0 node id) (error "No Implementation"))
 (define (node-set-connection-O0 node id new-c) (error "No Implementation"))
+
+; Util
+(define (_sort-nodes-O0 nodes)
+  (sort nodes (lambda (p1 p2)
+                 (< (car p1) (car p2)))))
+
+(define (_nodes-get-valid-id-O0 nodes counter)
+  (cond [(empty? nodes) counter]
+        [(eq? (car (car nodes)) counter) (_nodes-get-valid-id-O0 (rest nodes) (add1 counter))]
+        [else counter]))
+
+(define (_graph-get-valid-id-O0 graph)
+  (_nodes-get-valid-id-O0 (_sort-nodes-O0 (car graph)) 0))

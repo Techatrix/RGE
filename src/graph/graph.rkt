@@ -10,7 +10,7 @@
   (class graph-base%
     (super-new)
     ; Graph add/delete
-    (define/override (graph-add-node graph) (graph-add-node-O0 graph node))
+    (define/override (graph-add-node graph point) (graph-add-node-O0 graph point))
     (define/override (graph-delete-node graph id) (graph-delete-node-O0 graph id))
     
     ; Graph get
@@ -39,13 +39,14 @@
     ; Node get/set
     (define/override (node-get-connection node id) (node-get-connection-O0 node id))
     (define/override (node-set-connection node id new-c) (node-set-connection-O0 node id new-c))
+
     ))
 
 (define graph-O2%
   (class graph-base%
     (super-new)
     ; Graph add/delete
-    (define/override (graph-add-node graph) (graph-add-node-O2 graph node))
+    (define/override (graph-add-node graph point) (graph-add-node-O2 graph point))
     (define/override (graph-delete-node graph id) (graph-delete-node-O2 graph id))
     
     ; Graph get
@@ -74,4 +75,5 @@
     ; Node get/set
     (define/override (node-get-connection node id) (node-get-connection-O2 node id))
     (define/override (node-set-connection node id new-c) (node-set-connection-O2 node id new-c))
+    
     ))
