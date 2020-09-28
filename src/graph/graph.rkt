@@ -1,6 +1,8 @@
 #lang racket
 
 (require "graph-base.rkt")
+(require "node-O0.rkt")
+(require "node-O2.rkt")
 (require "graph-O0.rkt")
 (require "graph-O2.rkt")
 
@@ -24,21 +26,34 @@
     (define/override (graph-set-node-id graph id new-id) (graph-set-node-id-O0 graph id new-id))
     (define/override (graph-set-node-position graph id new-pos) (graph-set-node-position-O0 graph id new-pos))
     (define/override (graph-set-node-connections graph id new-list-cons) (graph-set-node-connections-O0 graph id new-list-cons))
+    (define/override (graph-set-node-add-connection graph id1 id2) (graph-set-node-add-connection-O0 graph id1 id2))
+    (define/override (graph-set-node-delete-connection graph id1 id2) (graph-set-node-delete-connection-O0 graph id1 id2))
     
     ; Graph search
     (define/override (graph-search-node-by-id graph id) (graph-search-node-by-id-O0 graph id))
     (define/override (graph-search-node-by-position graph pos) (graph-search-node-by-position-O0 graph pos))
     (define/override (graph-search-node-by-connection graph con) (graph-search-node-by-connection-O0 graph con))
     (define/override (graph-search-node-by-connections graph list-cons) (graph-search-node-by-connections-O0 graph list-cons))
-    
-    
+
+    ; Graph search comparison
+    ; (define/override (graph-search-node-by-comparison-id graph choose-first?) (graph-search-node-by-comparison-id-O0 graph choose-first?))
+    ; (define/override (graph-search-node-by-comparison-position graph choose-first?) (graph-search-node-by-comparison-position-O0 graph choose-first?))
+    (define/override (graph-search-node-by-closest-position graph choose-first?) (graph-search-node-by-closest-position-O0 graph choose-first?))
+
+
+    ; Node get
+    (define/override (node-get-id node) (node-get-id-O0 node))
+    (define/override (node-get-position node) (node-get-position-O0 node))
+    (define/override (node-get-connections node) (node-get-connections-O0 node))
+
+    ; Node set
+    (define/override (node-set-id node new-id) (node-set-id-O0 node new-id))
+    (define/override (node-set-position node new-pos) (node-set-position-O0 node new-pos))
+    (define/override (node-set-connections node new-list-cons) (node-set-connections-O0 node new-list-cons))
+
     ; Node add/delete
     (define/override (node-add-connection node c) (node-add-connection-O0 node c))
     (define/override (node-delete-connection node id) (node-delete-connection-O0 node id))
-
-    ; Node get/set
-    (define/override (node-get-connection node id) (node-get-connection-O0 node id))
-    (define/override (node-set-connection node id new-c) (node-set-connection-O0 node id new-c))
 
     ))
 
@@ -60,20 +75,32 @@
     (define/override (graph-set-node-id graph id new-id) (graph-set-node-id-O2 graph id new-id))
     (define/override (graph-set-node-position graph id new-pos) (graph-set-node-position-O2 graph id new-pos))
     (define/override (graph-set-node-connections graph id new-list-cons) (graph-set-node-connections-O2 graph id new-list-cons))
+    (define/override (graph-set-node-add-connection graph id1 id2) (graph-set-node-add-connection-O2 graph id1 id2))
+    (define/override (graph-set-node-delete-connection graph id1 id2) (graph-set-node-delete-connection-O2 graph id1 id2))
     
     ; Graph search
     (define/override (graph-search-node-by-id graph id) (graph-search-node-by-id-O2 graph id))
     (define/override (graph-search-node-by-position graph pos) (graph-search-node-by-position-O2 graph pos))
     (define/override (graph-search-node-by-connection graph con) (graph-search-node-by-connection-O2 graph con))
     (define/override (graph-search-node-by-connections graph list-cons) (graph-search-node-by-connections-O2 graph list-cons))
+
+    ; Graph search comparison
+    ; (define/override (graph-search-node-by-comparison-id graph choose-first?) (graph-search-node-by-comparison-id-O2 graph choose-first?))
+    ; (define/override (graph-search-node-by-comparison-position graph choose-first?) (graph-search-node-by-comparison-position-O2 graph choose-first?))
+    (define/override (graph-search-node-by-closest-position graph pos) (graph-search-node-by-closest-position-O2 graph pos))
     
-    
+    ; Node get
+    (define/override (node-get-id node) (node-get-id-O2 node))
+    (define/override (node-get-position node) (node-get-position-O2 node))
+    (define/override (node-get-connections node) (node-get-connections-O2 node))
+
+    ; Node set
+    (define/override (node-set-id node new-id) (node-set-id-O2 node new-id))
+    (define/override (node-set-position node new-pos) (node-set-position-O2 node new-pos))
+    (define/override (node-set-connections node new-list-cons) (node-set-connections-O2 node new-list-cons))
+
     ; Node add/delete
     (define/override (node-add-connection node c) (node-add-connection-O2 node c))
     (define/override (node-delete-connection node id) (node-delete-connection-O2 node id))
-
-    ; Node get/set
-    (define/override (node-get-connection node id) (node-get-connection-O2 node id))
-    (define/override (node-set-connection node id new-c) (node-set-connection-O2 node id new-c))
     
     ))

@@ -1,10 +1,9 @@
 #lang typed/racket
 
+(require "node-O2.rkt")
+
 (provide (all-defined-out))
 
-(struct connection ([id : Integer]))
-(struct point ([x : Real] [y : Real]))
-(struct node ([id : Integer] [pos : point] [connections : (Listof connection)]))
 (struct graph ([points : (Listof node)]))
 
 ; Graph add/delete
@@ -40,6 +39,12 @@
 (: graph-set-node-connections-O2 (-> graph Integer (Listof connection) graph))
 (define (graph-set-node-connections-O2 graph id new-list-cons) (error "No Implementation") graph)
 
+(: graph-set-node-add-connection-O2 (-> graph Integer Integer graph))
+(define (graph-set-node-add-connection-O2 graph id1 id2) (error "No Implementation") graph)
+
+(: graph-set-node-delete-connection-O2 (-> graph Integer Integer graph))
+(define (graph-set-node-delete-connection-O2 graph id1 id2) (error "No Implementation") graph)
+
 ; Graph search node
 (: graph-search-node-by-id-O2 (-> graph Integer node))
 (define (graph-search-node-by-id-O2 graph id) (error "No Implementation"))
@@ -53,23 +58,13 @@
 (: graph-search-node-by-connections-O2 (-> graph (Listof connection) node))
 (define (graph-search-node-by-connections-O2 graph list-cons) (error "No Implementation"))
 
+; Graph search comparison
+; (: graph-search-node-by-comparison-id-O2 (-> graph (-> Integer Integer Boolean) node))
+; (define (graph-search-node-by-comparison-id-O2 graph choose-first?) (error "No Implementation"))
 
-; Node add/delete
-(: node-add-connection-O2 (-> node connection node))
-(define (node-add-connection-O2 node c) (error "No Implementation") node)
+; (: graph-search-node-by-comparison-position-O2 (-> graph (-> point point point Boolean) node))
+; (define (graph-search-node-by-comparison-position-O2 graph choose-first?) (error "No Implementation"))
 
-(: node-delete-connection-O2 (-> node Integer node))
-(define (node-delete-connection-O2 node id) (error "No Implementation") node)
-
-; Node get/set
-(: node-get-connection-O2 (-> node Integer connection))
-(define (node-get-connection-O2 node id) (error "No Implementation"))
-
-(: node-set-connection-O2 (-> node Integer connection node))
-(define (node-set-connection-O2 node id new-c) (error "No Implementation"))
-
-; Util
-(define (_graph-get-valid-id-O2 graph) 0)
-
-
+(: graph-search-node-by-closest-position-O2 (-> graph point node))
+(define (graph-search-node-by-closest-position-O2 graph pos) (error "No Implementation"))
 
