@@ -11,6 +11,9 @@
 (define graph-O0%
   (class graph-base%
     (super-new)
+    ; Graph make
+    (define/override (graph-make) (graph-make-O0))
+
     ; Graph add/delete
     (define/override (graph-add-node graph point) (graph-add-node-O0 graph point))
     (define/override (graph-delete-node graph id) (graph-delete-node-O0 graph id))
@@ -41,9 +44,13 @@
     (define/override (graph-search-node-by-closest-position graph choose-first?) (graph-search-node-by-closest-position-O0 graph choose-first?))
 
 
+    ; Node make
+    (define/override (node-make id pos list-cons) (node-make-O0 id pos list-cons))
+
     ; Node get
     (define/override (node-get-id node) (node-get-id-O0 node))
     (define/override (node-get-position node) (node-get-position-O0 node))
+    (define/override (node-get-connection node id) (node-get-connection-O0 node id))
     (define/override (node-get-connections node) (node-get-connections-O0 node))
 
     ; Node set
@@ -60,6 +67,9 @@
 (define graph-O2%
   (class graph-base%
     (super-new)
+    ; Graph make
+    (define/override (graph-make) (graph-make-O2))
+
     ; Graph add/delete
     (define/override (graph-add-node graph point) (graph-add-node-O2 graph point))
     (define/override (graph-delete-node graph id) (graph-delete-node-O2 graph id))
@@ -89,9 +99,13 @@
     ; (define/override (graph-search-node-by-comparison-position graph choose-first?) (graph-search-node-by-comparison-position-O2 graph choose-first?))
     (define/override (graph-search-node-by-closest-position graph pos) (graph-search-node-by-closest-position-O2 graph pos))
     
+    ; Node make
+    (define/override (node-make id pos list-cons) (node-make-O2 id pos list-cons))
+
     ; Node get
     (define/override (node-get-id node) (node-get-id-O2 node))
     (define/override (node-get-position node) (node-get-position-O2 node))
+    (define/override (node-get-connection node id) (node-get-connection-O2 node id))
     (define/override (node-get-connections node) (node-get-connections-O2 node))
 
     ; Node set

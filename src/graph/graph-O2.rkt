@@ -6,6 +6,10 @@
 
 (struct graph ([points : (Listof node)]))
 
+; Graph make
+(: graph-make-O2 (-> graph))
+(define (graph-make-O2) (error "No Implementation") (graph (list)))
+
 ; Graph add/delete
 (: graph-add-node-O2 (-> graph point graph))
 (define (graph-add-node-O2 graph point) (error "No Implementation") graph)
@@ -15,7 +19,7 @@
 
 ; Graph get
 (: graph-get-node-O2 (-> graph Integer node))
-(define (graph-get-node-O2 graph id) (error "No Implementation") (node 0 (point 0 0) (list (connection 0))))
+(define (graph-get-node-O2 graph id) (error "No Implementation") (node 0 (point 0 0) (list)))
 
 (: graph-get-node-id-O2 (-> graph Integer Integer))
 (define (graph-get-node-id-O2 graph id) (error "No Implementation") id)
@@ -24,7 +28,7 @@
 (define (graph-get-node-position-O2 graph id) (error "No Implementation") (point 0 0))
 
 (: graph-get-node-connections-O2 (-> graph Integer (Listof connection)))
-(define (graph-get-node-connections-O2 graph id) (error "No Implementation") (list (connection 0)))
+(define (graph-get-node-connections-O2 graph id) (error "No Implementation") (list))
 
 ; Graph set
 (: graph-set-node-O2 (-> graph Integer node graph))

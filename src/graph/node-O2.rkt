@@ -6,12 +6,19 @@
 (struct point ([x : Real] [y : Real]))
 (struct node ([id : Integer] [pos : point] [connections : (Listof connection)]))
 
+; Node make
+(: node-make-O2 (-> Integer point (Listof connection) node))
+(define (node-make-O2 id pos list-cons) (error "No Implementation") (node 0 (point 0 0) (list)))
+
 ; Node get
 (: node-get-id-O2 (-> node Void))
 (define (node-get-id-O2 node) (error "No Implementation"))
 
 (: node-get-position-O2 (-> node Void))
 (define (node-get-position-O2 node) (error "No Implementation"))
+
+(: node-get-connection-O2 (-> node Integer connection))
+(define (node-get-connection-O2 node id) (error "No Implementation") (connection 0))
 
 (: node-get-connections-O2 (-> node Void))
 (define (node-get-connections-O2 node) (error "No Implementation"))

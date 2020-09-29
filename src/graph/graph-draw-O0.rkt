@@ -3,10 +3,9 @@
 (require "graph-O0.rkt")
 (require "node-O0.rkt")
 (require "../util.rkt")
+(require "../draw-util.rkt")
 
 (provide draw-graph)
-
-(define node-size 50)
 
 ; draw graph
 (define (draw-graph graph canvas-dc)
@@ -20,8 +19,7 @@
               (draw-nodes-point (rest nodes) canvas-dc)]))
 
 (define (draw-node-point node canvas-dc)
-  (define pos (node-get-position-O0 node))
-  (send canvas-dc draw-ellipse (- (car pos) (/ node-size 2)) (- (cadr pos) (/ node-size 2)) node-size node-size))
+  (draw-point canvas-dc (node-get-position-O0 node)))
 
 ; draw nodes connections
 (define (draw-nodes-connections graph nodes canvas-dc)
@@ -40,4 +38,4 @@
 (define (draw-connection graph node connection canvas-dc)
   (define pos1 (node-get-position-O0 node))
   (define pos2 (node-get-position-O0 (graph-search-node-by-id-O0 graph (car connection))))
-  (draw-line canvas-dc pos1 pos2))
+  (draw-arrow canvas-dc pos1 pos2))
