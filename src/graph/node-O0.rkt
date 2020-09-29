@@ -1,10 +1,17 @@
 #lang racket
 
+(require "node-util-O0.rkt")
+(require "../util.rkt")
+
 (provide (all-defined-out))
+
+; Node make
+(define (node-make-O0 id pos list-cons) (list id pos list-cons))
 
 ; Node get
 (define (node-get-id-O0 node) (car node))
 (define (node-get-position-O0 node) (cadr node))
+(define (node-get-connection-O0 node id) (list-search-first (node-get-connections-O0 node) (lambda (con) (eq? (car con) id))))
 (define (node-get-connections-O0 node) (caddr node))
 
 ; Node set
@@ -15,5 +22,5 @@
 ; Node add/delete
 (define (node-add-connection-O0 node new-con)
   (node-set-connections-O0 node (append (node-get-connections-O0 node) (list new-con))))
-
-(define (node-delete-connection-O0 node id) (error "No Implementation"))
+(define (node-delete-connection-O0 node id)
+  (node-set-connections-O0 node (connections-delete-connection-O0 (node-get-connections-O0 node) id) ))

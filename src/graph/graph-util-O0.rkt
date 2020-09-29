@@ -5,27 +5,21 @@
 
 (provide (all-defined-out))
 
-; nodes add
-(define (nodes-add-node-O0 nodes node)
-  (append nodes (list node)))
-
 ; nodes delete
 (define (nodes-delete-node-O0 nodes id)
   (cond [(empty? nodes) '()]
         [(eq? (car (car nodes)) id) (rest nodes)]
-        [else (append (list (car nodes)) (nodes-delete-node-O0 (rest nodes) id))]))
+        [else (append (list (node-delete-connection-O0 (car nodes) id)) (nodes-delete-node-O0 (rest nodes) id))]))
+
+; graph set nodes
+(define (graph-set-nodes-O0 graph nodes)
+  (append (list nodes) (rest graph)))
 
 ; nodes apply
 (define (nodes-apply-node-O0 nodes id proc)
   (cond [(empty? nodes) '()]
         [(eq? (node-get-id-O0 (car nodes)) id) (append (list (proc (car nodes))) (rest nodes))]
         [else (append (list (car nodes)) (nodes-apply-node-O0 (rest nodes) id proc))]))
-
-; nodes search
-(define (nodes-search-node nodes proc)
-  (cond [(empty? nodes) void]
-        [(proc (car nodes)) (car nodes)]
-        [else (nodes-search-node (rest nodes) proc)]))
 
 ; nodes sort
 (define (sort-nodes-O0 nodes)
@@ -48,10 +42,6 @@
                           (define dist2 (dst-PtoP pos (second node2)))
                           (cond [(< dist1 dist2) node1]
                                 [else node2])])]))
-
-; graph set nodes
-(define (graph-set-nodes-O0 graph nodes)
-  (append (list nodes) (rest graph)))
 
 ; graph get valid id
 (define (graph-get-valid-id-O0 graph)

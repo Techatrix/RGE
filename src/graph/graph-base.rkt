@@ -9,6 +9,9 @@
 
 (define graph-base%
   (class object%
+    ; Graph make
+    (abstract graph-make)
+
     ; Graph add/delete
     (abstract graph-add-node)
     (abstract graph-delete-node)
@@ -38,9 +41,13 @@
     ;(abstract graph-search-node-by-comparison-position)
     (abstract graph-search-node-by-closest-position)
 
+    ; Node make
+    (abstract node-make)
+
     ; Node get
     (abstract node-get-id)
     (abstract node-get-position)
+    (abstract node-get-connection)
     (abstract node-get-connections)
 
     ; Node set
