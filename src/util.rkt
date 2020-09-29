@@ -3,6 +3,8 @@
 (provide dst-PtoP)
 (provide draw-line)
 (provide draw-arrow)
+(provide add-point)
+(provide sub-point)
 (provide delete-n)
 (provide number-wrap)
 
@@ -26,6 +28,12 @@
   (draw-line dc x2 y2 (* (cos (- beta 5)) 5) (* (sin (- beta 5)) 5)
   |#
   )
+
+(define (add-point p1 p2)
+  (list (+ (car p1) (car p2)) (+ (cadr p1) (cadr p2))))
+
+(define (sub-point p1 p2)
+  (list (- (car p1) (car p2)) (- (cadr p1) (cadr p2))))
 
 (define (delete-n l n)
   (cond [(empty? l) '()]
