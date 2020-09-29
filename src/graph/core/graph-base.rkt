@@ -1,8 +1,8 @@
 #lang racket
 
-(require "graph-O0.rkt") ; racket with recursion
+(require "../intern/graph-O0.rkt") ; racket with recursion
 ; (require "graph-O1.rkt") ; racket without recursion
-(require "graph-O2.rkt") ; typed racket
+(require "../intern/graph-O2.rkt") ; typed racket
 ; (require "graph-O3.rkt") ; racket FFI C
 
 (provide graph-base%)

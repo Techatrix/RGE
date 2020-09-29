@@ -1,8 +1,8 @@
 #lang racket/gui
 
 (require "../graph/graph.rkt")
-(require "../graph/graph-draw-O0.rkt")
-(require "../util.rkt")
+(require "../graph/intern/graph-draw-O0.rkt") ; TEMP
+(require "../util/util.rkt")
 
 (provide graph-canvas%)
 

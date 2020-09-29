@@ -2,8 +2,8 @@
 
 (require "graph-O0.rkt")
 (require "node-O0.rkt")
-(require "../util.rkt")
-(require "../draw-util.rkt")
+(require "../../util/util.rkt")
+(require "../../util/draw-util.rkt")
 
 (provide draw-graph)
 
