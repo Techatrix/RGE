@@ -1,11 +1,8 @@
 #lang racket/gui
 
 (require framework)
-(require "graph/graph-draw-O0.rkt")
-(require "graph/graph.rkt")
-(require "util.rkt")
-(require "event-canvas.rkt")
-(require "gui/graph-canvas.rkt")
+(require "graph-canvas.rkt")
+(require "../util/util.rkt")
 
 (provide gui%)
 

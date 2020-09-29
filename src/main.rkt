@@ -1,5 +1,5 @@
 #lang racket
-(require "gui.rkt")
+(require "gui/gui.rkt")
 
 (define gui
   (new gui%

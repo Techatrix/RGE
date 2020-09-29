@@ -2,7 +2,7 @@
 
 (require "graph-util-O0.rkt")
 (require "node-O0.rkt")
-(require "../util.rkt")
+(require "../../util/util.rkt")
 
 (provide (all-defined-out))
 

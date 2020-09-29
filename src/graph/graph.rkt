@@ -1,10 +1,10 @@
 #lang racket
 
-(require "graph-base.rkt")
-(require "node-O0.rkt")
-(require "node-O2.rkt")
-(require "graph-O0.rkt")
-(require "graph-O2.rkt")
+(require "core/graph-base.rkt")
+(require "intern/node-O0.rkt")
+(require "intern/node-O2.rkt")
+(require "intern/graph-O0.rkt")
+(require "intern/graph-O2.rkt")
 
 (provide (all-defined-out))
 
