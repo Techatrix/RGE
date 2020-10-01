@@ -26,6 +26,13 @@
     (define/public (set-model-level level)
       (set! model-level level))
 
+    (define/public (get-data) data)
+
+    (define/public (set-data new-data)
+      (set! data (if (eq? new-data void) (send model graph-make) new-data))
+      (send this refresh))
+
+
     (define/private (get-mouse-position event)
       (list (send event get-x) (send event get-y)))
 

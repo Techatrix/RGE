@@ -33,7 +33,7 @@
          [shortcut #\T]
          [callback
           (lambda (item event)
-            (add-choices tab-panel "Untitled")
+            (add-tab "Untitled")
             (send tab-panel set-selection (- (send tab-panel get-number) 1))
             (writeln "New Graph"))])
     (new menu-item%
@@ -67,7 +67,8 @@
          [shortcut #\W]
          [callback
           (lambda (item event)
-            (remove-choices tab-panel (send tab-panel get-selection)) ; TODO: handle last tab
+            (cond [(eq? (send tab-panel get-number) 1) (exit)]
+                  [else (remove-tab (send tab-panel get-selection))])
             (writeln "Close"))])
     (new menu-item%
          [parent menu-1]
@@ -222,14 +223,19 @@
          [shortcut #\[]
          [callback
           (lambda (item event)
-            (send tab-panel set-selection (number-wrap 0 (- (send tab-panel get-number) 1) (- (send tab-panel get-selection) 1))))])
+            (define new-selection (number-wrap 0 (- (send tab-panel get-number) 1) (- (send tab-panel get-selection) 1)))
+            (send tab-panel set-selection new-selection)
+            (_tab-panel-set-selection new-selection))])
     (new menu-item%
          [parent menu-5]
          [label "Next Tab"]
          [shortcut #\]]
          [callback
           (lambda (item event)
-            (send tab-panel set-selection (number-wrap 0 (- (send tab-panel get-number) 1) (+ (send tab-panel get-selection) 1))))])
+            (define new-selection (number-wrap 0 (- (send tab-panel get-number) 1) (+ (send tab-panel get-selection) 1)))
+            (send tab-panel set-selection new-selection)
+            (_tab-panel-set-selection new-selection))])
+    
     (new separator-menu-item% [parent menu-4])
 
     ; menu-item: Tabs 1-8
@@ -238,7 +244,10 @@
                 [parent menu-5]
                 [label (string-append "Tab " (number->string n))]
                 [shortcut (integer->char (+ n 48))]
-                [callback (lambda (item event) (cond [(<= n (send tab-panel get-number)) (send tab-panel set-selection (- n 1))]))]))
+                [callback (lambda (item event)
+                            (cond [(<= n (send tab-panel get-number))
+                                   (send tab-panel set-selection (- n 1))
+                                   (_tab-panel-set-selection (- n 1))]))]))
          (build-list 8 (lambda (n) (+ n 1))))
 
     
@@ -255,32 +264,59 @@
           (lambda (item event)
             (writeln "About RGE"))])
 
-    (define choices-raw (list "Untitled"))
-    (define (_update-choices tab-panel choices-raw i)
-      (cond [(empty? choices-raw)]
-            [else (send tab-panel set-item-label i (string-append (number->string i) ": " (car choices-raw)))
-                  (_update-choices tab-panel (rest choices-raw) (+ i 1))]))
-    (define
-      (add-choices tab-panel label)
+
+    ;TAB: (label, issaved?, data)
+    (define tabs (list (list "Untitled" #f void)))
+    
+    (define (_tab-get-label tab id)
+      (string-append (if (cadr tab) "" "★ ") (number->string id) ": " (car tab)))
+
+    (define (_update-tabs tabs i)
+      (cond [(empty? tabs)]
+            [else (send tab-panel set-item-label i (_tab-get-label (car tabs) i))
+                  (_update-tabs (rest tabs) (+ i 1))]))
+
+    (define (_update-tab-data tab data) (list (car tab) (cadr tab) data))
+
+    (define (_update-tabs-data tabs id data i)
+      (cond [(empty? tabs)]
+            [(eq? id i) (append (list (_update-tab-data (car tabs) data)) (rest tabs))]
+            [else (append (list (car tabs)) (_update-tabs-data (rest tabs) id data (+ i 1)))]))
+                  
+    (define (add-tab label)
       (send tab-panel append label)
-      (set! choices-raw (append choices-raw (list label)))
-      (_update-choices tab-panel choices-raw 0))
+      (set! tabs (append tabs (list (list label #f void))))
+      (_tab-panel-set-selection (+ tab-panel-selection 1))
+      (_update-tabs tabs 0))
     
-    (define (remove-choices tab-panel i)
+    (define (remove-tab i)
+      (_tab-panel-set-selection (- i 1))
       (send tab-panel delete i)
-      (set! choices-raw (delete-n choices-raw i))
-      (_update-choices tab-panel choices-raw 0))
+      (set! tabs (list-delete-n tabs i))
+      (_update-tabs tabs 0))
+
+    (define (_tabs-get-data tabs id i)
+      (cond [(empty? tabs) void]
+            [(eq? id i) (caddr (car tabs))]
+            [else (_tabs-get-data (rest tabs) id (+ i 1))]))
     
+    (define tab-panel-selection 0)
+
+    (define (_tab-panel-set-selection id)
+      (set! tabs (_update-tabs-data tabs tab-panel-selection (send graph-canvas get-data) 0)) ; TODO: only do if required
+      (send graph-canvas set-data (_tabs-get-data tabs id 0))
+      (set! tab-panel-selection id))
+
     ; Tab Panel
     (define tab-panel
       (new tab-panel%
            [parent this]
-           [choices choices-raw]
+           [choices (list "")]
            [callback
             (lambda (panel event)
-              (writeln "Tab callback"))]))
+              (_tab-panel-set-selection (send panel get-selection)))]))
     
-    (_update-choices tab-panel choices-raw 0)
+    (_update-tabs tabs 0)
 
     (define view-panel
       (new horizontal-panel%
