@@ -1,6 +1,5 @@
 #lang racket/gui
 
-(require framework)
 (require "graph-canvas.rkt")
 (require "../util/util.rkt")
 
@@ -26,7 +25,7 @@
          [shortcut #\N]
          [callback
           (lambda (item event)
-            (writeln "New"))])
+            (displayln "New"))])
     (new menu-item%
          [parent menu-1]
          [label "New Graph"]
@@ -35,23 +34,23 @@
           (lambda (item event)
             (add-tab "Untitled")
             (send tab-panel set-selection (- (send tab-panel get-number) 1))
-            (writeln "New Graph"))])
+            (displayln "New Graph"))])
     (new menu-item%
          [parent menu-1]
          [label "Open"]
          [shortcut #\O]
          [callback
           (lambda (item event)
-            (writeln "Open")
-            (writeln (finder:get-file)))])
+            (display "Open: ")
+            (displayln (get-file #f #f #f #f #f null '(("JSON (*.json)" "*.json")))))])
     (new menu-item%
          [parent menu-1]
          [label "Save"]
          [shortcut #\S]
          [callback
           (lambda (item event)
-            (writeln "Save")
-            (writeln (finder:put-file)))])
+            (display "Save: ")
+            (displayln (put-file)))])
     (new menu-item%
          [parent menu-1]
          [label "Save as"]
@@ -59,8 +58,8 @@
          [shortcut-prefix (list 'shift 'ctl)]
          [callback
           (lambda (item event)
-            (writeln "Save as")
-            (writeln (finder:put-file)))])
+            (display "Save as: ")
+            (displayln (put-file)))])
     (new menu-item%
          [parent menu-1]
          [label "Close"]
@@ -69,14 +68,14 @@
           (lambda (item event)
             (cond [(eq? (send tab-panel get-number) 1) (exit)]
                   [else (remove-tab (send tab-panel get-selection))])
-            (writeln "Close"))])
+            (displayln "Close"))])
     (new menu-item%
          [parent menu-1]
          [label "Quit"]
          [shortcut #\Q]
          [callback
           (lambda (item event)
-            (writeln "Quit")
+            (displayln "Quit")
             (exit))])
   
     ; Edit Menu
@@ -91,7 +90,7 @@
          [shortcut #\Z]
          [callback
           (lambda (item event)
-            (writeln "Undo"))])
+            (displayln "Undo"))])
     (new menu-item%
          [parent menu-2]
          [label "Redo"]
@@ -99,14 +98,14 @@
          [shortcut-prefix (list 'shift 'ctl)]
          [callback
           (lambda (item event)
-            (writeln "Redo"))])
+            (displayln "Redo"))])
     (new separator-menu-item% [parent menu-2])
     (new menu-item%
          [parent menu-2]
          [label "Clear All"]
          [callback
           (lambda (item event)
-            (writeln "Clear All"))])
+            (displayln "Clear All"))])
     (new menu%
          [label "Sub Menu"]
          [parent menu-2])
@@ -122,20 +121,20 @@
          [shortcut 'add]
          [callback
           (lambda (item event)
-            (writeln "Zoom in"))])
+            (displayln "Zoom in"))])
     (new menu-item%
          [parent menu-3]
          [label "Zoom out"]
          [shortcut 'subtract]
          [callback
           (lambda (item event)
-            (writeln "Zoom out"))])
+            (displayln "Zoom out"))])
     (new menu-item%
          [parent menu-3]
          [label "View auto"]
          [callback
           (lambda (item event)
-            (writeln "View auto"))])
+            (displayln "View auto"))])
 
     (new checkable-menu-item%
          [parent menu-3]
@@ -143,14 +142,14 @@
          [checked #f]
          [callback
           (lambda (item event)
-            (writeln "Draw Axis"))])
+            (displayln "Draw Axis"))])
     (new checkable-menu-item%
          [parent menu-3]
          [label "Draw Grid"]
          [checked #t]
          [callback
           (lambda (item event)
-            (writeln "Draw Grid"))])
+            (displayln "Draw Grid"))])
     
     ; Tools Menu
     (define menu-4
@@ -173,7 +172,7 @@
               (send menu-4-0-1 check #f)
               (send menu-4-0-2 check #f)
               (send menu-4-0-3 check #f)
-              (writeln "Racket"))]))
+              (displayln "Model: Racket"))]))
     (define menu-4-0-1
       (new checkable-menu-item%
            [parent menu-4-0]
@@ -185,7 +184,7 @@
               (send menu-4-0-0 check #f)
               (send menu-4-0-2 check #f)
               (send menu-4-0-3 check #f)
-              (writeln "Racket Optimized"))]))
+              (displayln "Model: Racket Optimized"))]))
     (define menu-4-0-2
       (new checkable-menu-item%
            [parent menu-4-0]	
@@ -197,7 +196,7 @@
               (send menu-4-0-0 check #f)
               (send menu-4-0-1 check #f)
               (send menu-4-0-3 check #f)
-              (writeln "Racket Typed"))]))
+              (displayln "Model: Racket Typed"))]))
     (define menu-4-0-3
       (new checkable-menu-item%
            [parent menu-4-0]
@@ -209,7 +208,7 @@
               (send menu-4-0-0 check #f)
               (send menu-4-0-1 check #f)
               (send menu-4-0-2 check #f)
-              (writeln "FFI"))]))
+              (displayln "Model: FFI"))]))
     
     ; Tabs Menu
     (define menu-5
@@ -262,7 +261,7 @@
          [parent menu-6]
          [callback
           (lambda (item event)
-            (writeln "About RGE"))])
+            (displayln "About RGE"))])
 
 
     ;TAB: (label, issaved?, data)
@@ -322,12 +321,14 @@
       (new horizontal-panel%
            [parent tab-panel]))
 
-    (define tool-bar-size 20)
+    (define tool-bar-width 120)
+    (define tool-bar-height #f)
+
     (define tool-bar-panel
       (new vertical-panel%
            [parent view-panel]
            [alignment (list 'left 'top)]
-           [min-width tool-bar-size]
+           [min-width tool-bar-width]
            [stretchable-width #f]))
 
     (define tool-id 'none)
@@ -346,8 +347,8 @@
     (new button%
          [parent tool-bar-panel]
          [label tool-label-1]
-         [min-width tool-bar-size]
-         [min-height tool-bar-size]
+         [min-width tool-bar-width]
+         [min-height tool-bar-height]
          [stretchable-width #f]
          [stretchable-height #f]
          [callback (lambda (button event)
@@ -355,8 +356,8 @@
     (new button%
          [parent tool-bar-panel]
          [label tool-label-2]
-         [min-width tool-bar-size]
-         [min-height tool-bar-size]
+         [min-width tool-bar-width]
+         [min-height tool-bar-height]
          [stretchable-width #f]
          [stretchable-height #f]
          [callback (lambda (button event)
@@ -364,8 +365,8 @@
     (new button%
          [parent tool-bar-panel]
          [label tool-label-3]
-         [min-width tool-bar-size]
-         [min-height tool-bar-size]
+         [min-width tool-bar-width]
+         [min-height tool-bar-height]
          [stretchable-width #f]
          [stretchable-height #f]
          [callback (lambda (button event)
@@ -373,8 +374,8 @@
     (new button%
          [parent tool-bar-panel]
          [label tool-label-4]
-         [min-width tool-bar-size]
-         [min-height tool-bar-size]
+         [min-width tool-bar-width]
+         [min-height tool-bar-height]
          [stretchable-width #f]
          [stretchable-height #f]
          [callback (lambda (button event)
@@ -382,8 +383,8 @@
     (new button%
          [parent tool-bar-panel]
          [label tool-label-5]
-         [min-width tool-bar-size]
-         [min-height tool-bar-size]
+         [min-width tool-bar-width]
+         [min-height tool-bar-height]
          [stretchable-width #f]
          [stretchable-height #f]
          [callback (lambda (button event)

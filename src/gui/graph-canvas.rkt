@@ -79,7 +79,7 @@
     (super-new
      [paint-callback
       (lambda (canvas dc)
-        (draw-graph data dc))])
+        (send model graph-draw data dc))])
     
     (send (send this get-dc) set-smoothing 'smoothed)
     ))

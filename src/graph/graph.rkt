@@ -5,6 +5,8 @@
 (require "intern/node-O2.rkt")
 (require "intern/graph-O0.rkt")
 (require "intern/graph-O2.rkt")
+(require "intern/graph-draw-O0.rkt")
+(require "intern/graph-draw-O2.rkt")
 
 (provide (all-defined-out))
 
@@ -42,6 +44,9 @@
     ; (define/override (graph-search-node-by-comparison-id graph choose-first?) (graph-search-node-by-comparison-id-O0 graph choose-first?))
     ; (define/override (graph-search-node-by-comparison-position graph choose-first?) (graph-search-node-by-comparison-position-O0 graph choose-first?))
     (define/override (graph-search-node-by-closest-position graph choose-first?) (graph-search-node-by-closest-position-O0 graph choose-first?))
+
+    ; Graph draw
+    (define/override (graph-draw graph canvas-dc) (graph-draw-O0 graph canvas-dc))
 
 
     ; Node make
@@ -99,6 +104,10 @@
     ; (define/override (graph-search-node-by-comparison-position graph choose-first?) (graph-search-node-by-comparison-position-O2 graph choose-first?))
     (define/override (graph-search-node-by-closest-position graph pos) (graph-search-node-by-closest-position-O2 graph pos))
     
+    ; Graph draw
+    (define/override (graph-draw graph canvas-dc) (graph-draw-O2 graph canvas-dc))
+
+
     ; Node make
     (define/override (node-make id pos list-cons) (node-make-O2 id pos list-cons))
 
