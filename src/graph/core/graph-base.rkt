@@ -40,6 +40,9 @@
     ;(abstract graph-search-node-by-comparison-id)
     ;(abstract graph-search-node-by-comparison-position)
     (abstract graph-search-node-by-closest-position)
+    
+    ; Graph draw
+    (abstract graph-draw)
 
     ; Node make
     (abstract node-make)

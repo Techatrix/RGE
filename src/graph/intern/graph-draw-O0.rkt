@@ -5,37 +5,37 @@
 (require "../../util/util.rkt")
 (require "../../util/draw-util.rkt")
 
-(provide draw-graph)
+(provide (rename-out [draw-graph-O0 graph-draw-O0]))
 
 ; draw graph
-(define (draw-graph graph canvas-dc)
-  (draw-nodes-connections graph (car graph) canvas-dc)
-  (draw-nodes-point (car graph) canvas-dc))
+(define (draw-graph-O0 graph canvas-dc)
+  (draw-nodes-connections-O0 graph (car graph) canvas-dc)
+  (draw-nodes-point-O0 (car graph) canvas-dc))
 
 ; draw nodes point
-(define (draw-nodes-point nodes canvas-dc)
+(define (draw-nodes-point-O0 nodes canvas-dc)
   (cond [(empty? nodes)]
-        [else (draw-node-point (car nodes) canvas-dc)
-              (draw-nodes-point (rest nodes) canvas-dc)]))
+        [else (draw-node-point-O0 (car nodes) canvas-dc)
+              (draw-nodes-point-O0 (rest nodes) canvas-dc)]))
 
-(define (draw-node-point node canvas-dc)
+(define (draw-node-point-O0 node canvas-dc)
   (draw-point canvas-dc (node-get-position-O0 node)))
 
 ; draw nodes connections
-(define (draw-nodes-connections graph nodes canvas-dc)
+(define (draw-nodes-connections-O0 graph nodes canvas-dc)
   (cond [(empty? nodes)]
-        [else (draw-node-connections graph (car nodes) canvas-dc)
-              (draw-nodes-connections graph (rest nodes) canvas-dc)]))
+        [else (draw-node-connections-O0 graph (car nodes) canvas-dc)
+              (draw-nodes-connections-O0 graph (rest nodes) canvas-dc)]))
 
-(define (draw-node-connections graph node canvas-dc)
-  (draw-connections graph node (node-get-connections-O0 node) canvas-dc))
+(define (draw-node-connections-O0 graph node canvas-dc)
+  (draw-connections-O0 graph node (node-get-connections-O0 node) canvas-dc))
 
-(define (draw-connections graph node connections canvas-dc)
+(define (draw-connections-O0 graph node connections canvas-dc)
   (cond [(empty? connections)]
-        [else (draw-connection graph node (car connections) canvas-dc)
-              (draw-connections graph node (rest connections) canvas-dc)]))
+        [else (draw-connection-O0 graph node (car connections) canvas-dc)
+              (draw-connections-O0 graph node (rest connections) canvas-dc)]))
 
-(define (draw-connection graph node connection canvas-dc)
+(define (draw-connection-O0 graph node connection canvas-dc)
   (define pos1 (node-get-position-O0 node))
   (define pos2 (node-get-position-O0 (graph-search-node-by-id-O0 graph (car connection))))
   (draw-arrow canvas-dc pos1 pos2))
