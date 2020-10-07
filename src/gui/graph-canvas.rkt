@@ -1,7 +1,8 @@
 #lang racket/gui
 
-(require "../graph/graph.rkt")
-(require "../graph/intern/graph-draw-O0.rkt") ; TEMP
+(require "../graph/base/graph-base.rkt")
+(require "../graph/base/graph-draw-base.rkt")
+(require "../graph/base/node-base.rkt")
 (require "../util/util.rkt")
 (require "../util/draw-util.rkt")
 
@@ -9,11 +10,9 @@
 
 (define graph-canvas%
   (class canvas%
-    (init-field [tool-id 'none]
-                [model-level 0])
+    (init-field [tool-id 'none])
 
-    (define model (new graph-O0%))
-    (define data (send model graph-make))
+    (define graph (graph-make))
 
     (define mouse-pos (list 0 0))
     (define p-mouse-pos (list 0 0))
@@ -24,13 +23,10 @@
       (set! tool-id tool)
       (set! last-selection-id void))
 
-    (define/public (set-model-level level)
-      (set! model-level level))
+    (define/public (get-graph) graph)
 
-    (define/public (get-data) data)
-
-    (define/public (set-data new-data)
-      (set! data (if (eq? new-data void) (send model graph-make) new-data))
+    (define/public (set-graph new-graph)
+      (set! graph (if (eq? new-graph void) (graph-make) new-graph))
       (send this refresh))
 
     ; Graph View
@@ -87,32 +83,32 @@
                       (update-delta-mouse-pos event)
                       (cond [(and (eq? tool-id 'move-node) (send event get-left-down)) ; move Node
                              (cond [(eq? last-selection-id void)
-                                    (define node (send model graph-search-node-by-closest-position data (client->view mouse-pos)))
-                                    (cond [(and (not (eq? node void)) (< (dst-PtoP (client->view mouse-pos) (send model node-get-position node)) 25))
-                                           (set! last-selection-id (send model node-get-id node))])]
-                                   [else (define node-pos (send model graph-get-node-position data last-selection-id))
-                                         (set! data (send model graph-set-node-position data last-selection-id (add-point node-pos (div-point delta-mouse-pos (view-get-scale)))))])])
+                                    (define node (graph-search-node-by-closest-position graph (client->view mouse-pos)))
+                                    (cond [(and (not (eq? node void)) (< (dst-PtoP (client->view mouse-pos) (node-get-position node)) 25))
+                                           (set! last-selection-id (node-get-id node))])]
+                                   [else (define node-pos (graph-get-node-position graph last-selection-id))
+                                         (set! graph (graph-set-node-position graph last-selection-id (add-point node-pos (div-point delta-mouse-pos (view-get-scale)))))])])
                       (cond [(send event get-middle-down)
                              (define delta (div-point delta-mouse-pos (view-get-scale)))
                              (view-translate (car delta) (cadr delta))])]
 
                      [(eq? type 'left-down) 
                       (cond [(eq? tool-id 'add-node) ; add Node
-                             (set! data (send model graph-add-node data (client->view mouse-pos)))]
+                             (set! graph (graph-add-node graph (client->view mouse-pos)))]
                             
                             [(eq? tool-id 'delete-node) ; delete Node
-                             (define node (send model graph-search-node-by-closest-position data (client->view mouse-pos)))
-                             (cond [(and (not (eq? node void)) (< (dst-PtoP (client->view mouse-pos) (send model node-get-position node)) 25))
-                                    (set! data (send model graph-delete-node data (send model node-get-id node)))])]
+                             (define node (graph-search-node-by-closest-position graph (client->view mouse-pos)))
+                             (cond [(and (not (eq? node void)) (< (dst-PtoP (client->view mouse-pos) (node-get-position node)) 25))
+                                    (set! graph (graph-delete-node graph (node-get-id node)))])]
 
                             [(or (eq? tool-id 'add-connection) (eq? tool-id 'delete-connection)) ; add/delete Connection
-                             (define node (send model graph-search-node-by-closest-position data (client->view mouse-pos)))
+                             (define node (graph-search-node-by-closest-position graph (client->view mouse-pos)))
                              (cond [(eq? last-selection-id void)
-                                    (cond [(and (not (eq? node void)) (< (dst-PtoP (client->view mouse-pos) (send model node-get-position node)) 25))
-                                           (set! last-selection-id (send model node-get-id node))])]
+                                    (cond [(and (not (eq? node void)) (< (dst-PtoP (client->view mouse-pos) (node-get-position node)) 25))
+                                           (set! last-selection-id (node-get-id node))])]
                                    [else (if (eq? tool-id 'add-connection)
-                                             (set! data (send model graph-set-node-add-connection data last-selection-id (send model node-get-id node)))
-                                             (set! data (send model graph-set-node-delete-connection data last-selection-id (send model node-get-id node))))
+                                             (set! graph (graph-set-node-add-connection graph last-selection-id (node-get-id node)))
+                                             (set! graph (graph-set-node-delete-connection graph last-selection-id (node-get-id node))))
                                          (set! last-selection-id void)])])]
                      [(eq? type 'left-up) (cond [(eq? tool-id 'move-node) (set! last-selection-id void)])])
                (send this refresh)])))
@@ -132,7 +128,7 @@
         (send dc set-pen (make-object color% 255 255 255) 1 'solid)
         (send dc draw-line 0 0 0 10000)
         (send dc draw-line 0 0 10000 0)
-        (draw-graph data dc))])
+        (draw-graph graph dc))])
 
     (send (send this get-dc) set-smoothing 'smoothed)
     ))

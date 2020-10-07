@@ -1,7 +1,7 @@
 #lang racket
 
-(require "graph-O0.rkt")
-(require "node-O0.rkt")
+(require "graph-base.rkt")
+(require "node-base.rkt")
 (require "../../util/util.rkt")
 (require "../../util/draw-util.rkt")
 
