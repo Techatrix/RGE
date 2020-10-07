@@ -3,6 +3,7 @@
 (require framework)
 (require "graph-canvas.rkt")
 (require "../util/util.rkt")
+(require string-constants)
 
 (provide gui%)
 
@@ -19,23 +20,22 @@
     (define menu-1
       (new menu%
            [parent menu-bar]
-           [label "&File"]))
+           [label (string-constant file-menu-label)]))
     (new menu-item%
          [parent menu-1]
-         [label "New"]
+         [label (string-constant new-menu-item)]
          [shortcut #\N]
          [callback
           (lambda (item event)
             (writeln "New"))])
     (new menu-item%
          [parent menu-1]
-         [label "New Graph"]
+         [label (string-constant new-tab)]
          [shortcut #\T]
          [callback
           (lambda (item event)
-            (add-choices tab-panel "Untitled")
-            (send tab-panel set-selection (- (send tab-panel get-number) 1))
-            (writeln "New Graph"))])
+            (add-choices "Untitled")
+            (send tab-panel set-selection (- (send tab-panel get-number) 1)))])
     (new menu-item%
          [parent menu-1]
          [label "Open"]
@@ -46,7 +46,7 @@
             (writeln (finder:get-file)))])
     (new menu-item%
          [parent menu-1]
-         [label "Save"]
+         [label (string-constant save)]
          [shortcut #\S]
          [callback
           (lambda (item event)
@@ -63,37 +63,36 @@
             (writeln (finder:put-file)))])
     (new menu-item%
          [parent menu-1]
-         [label "Close"]
+         [label (string-constant close-tab)]
          [shortcut #\W]
          [callback
           (lambda (item event)
-            (remove-choices tab-panel (send tab-panel get-selection)) ; TODO: handle last tab
-            (writeln "Close"))])
+            (cond [(eq? (send tab-panel get-number) 1) (exit)]
+                  [else (remove-choices (send tab-panel get-selection))]))])
     (new menu-item%
          [parent menu-1]
-         [label "Quit"]
+         [label (string-constant quit)]
          [shortcut #\Q]
          [callback
           (lambda (item event)
-            (writeln "Quit")
             (exit))])
   
     ; Edit Menu
     (define menu-2
       (new menu%
            [parent menu-bar]
-           [label "&Edit"]))
+           [label (string-constant edit-menu-label)]))
 
     (new menu-item%
          [parent menu-2]
-         [label "Undo"]
+         [label (string-constant undo-menu-item)]
          [shortcut #\Z]
          [callback
           (lambda (item event)
             (writeln "Undo"))])
     (new menu-item%
          [parent menu-2]
-         [label "Redo"]
+         [label (string-constant redo-menu-item)]
          [shortcut #\Z]
          [shortcut-prefix (list 'shift 'ctl)]
          [callback
@@ -105,7 +104,9 @@
          [label "Clear All"]
          [callback
           (lambda (item event)
-            (writeln "Clear All"))])
+            (message-box "Confirm" "Are you sure?" this (list 'ok-cancel))
+            ;(send graph-canvas )
+            (displayln "Clear All"))])
     (new menu%
          [label "Sub Menu"]
          [parent menu-2])
@@ -214,18 +215,18 @@
     (define menu-5
       (new menu%
            [parent menu-bar]
-           [label "&Tabs"]))
+           [label (string-constant tabs-menu-label)]))
     
     (new menu-item%
          [parent menu-5]
-         [label "Previous Tab"]
+         [label (string-constant prev-tab)]
          [shortcut #\[]
          [callback
           (lambda (item event)
             (send tab-panel set-selection (number-wrap 0 (- (send tab-panel get-number) 1) (- (send tab-panel get-selection) 1))))])
     (new menu-item%
          [parent menu-5]
-         [label "Next Tab"]
+         [label (string-constant next-tab)]
          [shortcut #\]]
          [callback
           (lambda (item event)
@@ -236,7 +237,7 @@
     (map (lambda (n)
            (new menu-item%
                 [parent menu-5]
-                [label (string-append "Tab " (number->string n))]
+                [label (format (string-constant tab-i/no-name) n)]
                 [shortcut (integer->char (+ n 48))]
                 [callback (lambda (item event) (cond [(<= n (send tab-panel get-number)) (send tab-panel set-selection (- n 1))]))]))
          (build-list 8 (lambda (n) (+ n 1))))
@@ -245,7 +246,7 @@
     ; Help Menu
     (define menu-6
       (new menu%
-           (label "&Help")
+           (label (string-constant help-menu-label))
            [parent menu-bar]))
     
     (new menu-item%
