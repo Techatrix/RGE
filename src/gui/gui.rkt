@@ -34,7 +34,7 @@
          [shortcut #\T]
          [callback
           (lambda (item event)
-            (add-choices "Untitled")
+            (add-choices tab-panel "Untitled")
             (send tab-panel set-selection (- (send tab-panel get-number) 1)))])
     (new menu-item%
          [parent menu-1]
@@ -68,7 +68,7 @@
          [callback
           (lambda (item event)
             (cond [(eq? (send tab-panel get-number) 1) (exit)]
-                  [else (remove-choices (send tab-panel get-selection))]))])
+                  [else (remove-choices tab-panel (send tab-panel get-selection))]))])
     (new menu-item%
          [parent menu-1]
          [label (string-constant quit)]
