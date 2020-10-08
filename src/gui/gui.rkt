@@ -1,9 +1,11 @@
 #lang racket/gui
 
 (require framework)
-(require "graph-canvas.rkt")
-(require "../util/util.rkt")
 (require string-constants)
+
+(require "../graph/graph.rkt")
+(require "../util/util.rkt")
+(require "graph-canvas.rkt")
 
 (provide gui%)
 
@@ -261,8 +263,8 @@
       (cond [(empty? choices-raw)]
             [else (send tab-panel set-item-label i (string-append (number->string i) ": " (car choices-raw)))
                   (_update-choices tab-panel (rest choices-raw) (+ i 1))]))
-    (define
-      (add-choices tab-panel label)
+    
+    (define (add-choices tab-panel label)
       (send tab-panel append label)
       (set! choices-raw (append choices-raw (list label)))
       (_update-choices tab-panel choices-raw 0))
