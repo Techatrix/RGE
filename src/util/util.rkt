@@ -1,17 +1,20 @@
 #lang racket
 
+(require "structures.rkt")
+
+(provide (all-from-out "structures.rkt"))
+
 (provide (all-defined-out))
 
-(define (dst-PtoP pos1 pos2) (sqrt (+ (expt (- (car pos1) (car pos2)) 2) (expt (- (cadr pos1) (cadr pos2)) 2))))
+(define (dst-PtoP pos1 pos2) (sqrt (+ (expt (- (point-x pos1) (point-x pos2)) 2) (expt (- (point-y pos1) (point-y pos2)) 2))))
 
-(define (add-point p1 p2)
-  (list (+ (car p1) (car p2)) (+ (cadr p1) (cadr p2))))
-(define (sub-point p1 p2)
-  (list (- (car p1) (car p2)) (- (cadr p1) (cadr p2))))
-(define (mult-point p1 p2)
-  (list (* (car p1) (car p2)) (* (cadr p1) (cadr p2))))
-(define (div-point p1 p2)
-  (list (/ (car p1) (car p2)) (/ (cadr p1) (cadr p2))))
+(define (point-math-opt opt p1 p2)
+  (point (opt (point-x p1) (point-x p2)) (opt (point-y p1) (point-y p2))))
+
+(define (point-add p1 p2) (point-math-opt + p1 p2))
+(define (point-sub p1 p2) (point-math-opt - p1 p2))
+(define (point-mult p1 p2) (point-math-opt * p1 p2))
+(define (point-div p1 p2) (point-math-opt / p1 p2))
 
 (define (delete-n l n)
   (cond [(empty? l) '()]
