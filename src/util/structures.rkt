@@ -1,5 +1,28 @@
 #lang racket
 
-(provide (struct-out point))
+(provide (except-out (all-defined-out)
+                     vec2-math-opt))
 
-(struct point (x y) #:transparent)
+(struct vec2 (x y) #:transparent)
+
+(define (vec2-dist v1 v2)
+  (sqrt (+ (expt (- (vec2-x v1) (vec2-x v2)) 2)
+           (expt (- (vec2-y v1) (vec2-y v2)) 2))))
+
+(define (vec2-math-opt opt v1 v2)
+  (vec2 (opt (vec2-x v1) (vec2-x v2))
+        (opt (vec2-y v1) (vec2-y v2))))
+
+(define (vec2-add v1 v2) (vec2-math-opt + v1 v2))
+(define (vec2-sub v1 v2) (vec2-math-opt - v1 v2))
+(define (vec2-mult v1 v2) (vec2-math-opt * v1 v2))
+(define (vec2-div v1 v2) (vec2-math-opt / v1 v2))
+
+(define (vec2-scalar v scalar) (vec2 (* (vec2-x v) scalar) (* (vec2-y v) scalar)))
+(define (vec2-dot v1 v2) (+ (* (vec2-x v1) (vec2-x v2)) (* (vec2-y v1) (vec2-y v2))))
+(define (vec2-cross v1 v2) (error "No Implementation"))
+
+(define (vec2-angle v1 v2) (acos (/ (abs (vec2-dot v1 v2)) (* (vec2-length v1) (vec2-length v2)))))
+
+(define (vec2-length v) (sqrt (+ (expt (vec2-x v) 2) (expt (vec2-y v) 2))))
+(define (vec2-norm v) (vec2-scalar v (/ 1 (vec2-length v))))

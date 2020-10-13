@@ -7,4 +7,4 @@
 (define (connections-delete-connection connections id)
   (cond [(empty? connections) '()]
         [(eq? (connection-id (car connections)) id) (rest connections)]
-        [else (append (list (car connections)) (connections-delete-connection (rest connections) id))]))
+        [else (cons (car connections) (connections-delete-connection (rest connections) id))]))

@@ -8,52 +8,46 @@
 (provide draw-line)
 (provide draw-arrow)
 
-(define node-size 50)
-(define arrow-length 75)
-(define arrow-angle 0.5)
-
-
 (define (apply-transform dc pos)
-  (define transform (send dc get-initial-matrix))
+  (define t (send dc get-initial-matrix))
 
-  (define x-pos (point-x pos))
-  (define y-pos (point-y pos))
-  (define dx-pos (vector-ref transform 4))
-  (define dy-pos (vector-ref transform 5))
-  (define x-scale (vector-ref transform 0))
-  (define y-scale (vector-ref transform 3))
+  (define delta-pos (vec2 (vector-ref t 4) (vector-ref t 5)))
+  (define scale (vec2 (vector-ref t 0) (vector-ref t 3)))
 
-  (point (/ (- x-pos dx-pos) x-scale) (/ (- y-pos dy-pos) y-scale)))
+  (vec2-div (vec2-sub pos delta-pos) scale))
 
-(define (draw-point dc pos)
-  (send dc draw-ellipse (- (point-x pos) (/ node-size 2)) (- (point-y pos) (/ node-size 2)) node-size node-size))
+(define (draw-point dc pos size)
+  (send dc draw-ellipse (- (vec2-x pos) (/ size 2)) (- (vec2-y pos) (/ size 2)) size size))
 
-(define (draw-line dc pos1 pos2) (send dc draw-line (point-x pos1) (point-y pos1) (point-x pos2) (point-y pos2)))
+(define (draw-line dc pos1 pos2)
+  (send dc draw-line (vec2-x pos1) (vec2-y pos1) (vec2-x pos2) (vec2-y pos2)))
 
 (define (draw-arrow dc pos1 pos2)
+  (define arrow-length 50)
+  (define arrow-angle 0.5)
   (draw-line dc pos1 pos2)
 
-  (define delta (point-sub pos2 pos1))
-  (cond [(eq? (point-x delta) 0)
+  (define delta (vec2-sub pos2 pos1))
+  (cond [(eq? (vec2-x delta) 0)
          (define alpha (- arrow-angle (/ pi 2)))
 
          (define dx (* arrow-length (sin alpha)))
          (define dy (* arrow-length (cos alpha)))
 
-         (draw-line dc pos2 (point-add pos2 (point dx dy)))
+         (draw-line dc pos2 (vec2-add pos2 (vec2 dx dy)))
          ]
-        [else (define beta (atan (/ (- 0 (point-y delta)) (point-x delta))))
+        [else (define beta (atan (/ (- (vec2-y delta)) (vec2-x delta))))
               (define alpha1 (- (+ arrow-angle beta) (/ pi 2)))
 
               (define dx1 (* arrow-length (sin alpha1)))
               (define dy1 (* arrow-length (cos alpha1)))
 
-              (draw-line dc pos2 (point-add pos2 (point dx1 dy1)))
+              (draw-line dc pos2 (vec2-add pos2 (vec2 dx1 dy1)))
 
               (define alpha2 (- beta arrow-angle (/ pi 2)))
 
               (define dx2 (* arrow-length (sin alpha2)))
               (define dy2 (* arrow-length (cos alpha2)))
 
-              (draw-line dc pos2 (point-add pos2 (point dx2 dy2)))
+              (draw-line dc pos2 (vec2-add pos2 (vec2 dx2 dy2)))
               ]))

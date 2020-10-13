@@ -1,4 +1,4 @@
-#lang racket
+#lang racket/base
 
 (require "graph-base.rkt")
 (require "graph-base-draw.rkt")
