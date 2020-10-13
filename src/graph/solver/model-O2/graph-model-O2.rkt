@@ -1,9 +1,9 @@
 #lang typed/racket
 
 (require/typed "../../../util/structures.rkt"
-               [#:struct point ([x : Real] [y : Real])])
+               [#:struct vec2 ([x : Real] [y : Real])])
 
 (require/typed "../../base/base-structures.rkt"
-               [#:struct connection ([id : Integer])]
-               [#:struct node ([id : Integer] [position : point] [connections : connection])]
+               [#:struct connection ([id : Nonnegative-Integer] [weight : Real])]
+               [#:struct node ([id : Nonnegative-Integer] [position : vec2] [connections : connection])]
                [#:struct graph ([nodes : (Listof node)])])
