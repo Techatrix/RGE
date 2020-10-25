@@ -7,6 +7,7 @@
 (require "util.rkt")
 (require "../graph/graph.rkt")
 (require "../util/util.rkt")
+(require "../util/timer.rkt")
 
 (provide gui%)
 
@@ -101,6 +102,25 @@
          [callback
           (lambda (item event)
             (writeln "Redo"))])
+    (new separator-menu-item% [parent menu-2])
+    (new menu-item%
+         [parent menu-2]
+         [label "Cut"]
+         [shortcut #\X]
+         [callback
+          (lambda (item event) (send graph-canvas on-cut))])
+    (new menu-item%
+         [parent menu-2]
+         [label "Copy"]
+         [shortcut #\C]
+         [callback
+          (lambda (item event) (send graph-canvas on-copy))])
+    (new menu-item%
+         [parent menu-2]
+         [label "Paste"]
+         [shortcut #\V]
+         [callback
+          (lambda (item event) (send graph-canvas on-paste))])
     (new separator-menu-item% [parent menu-2])
     (new menu-item%
          [parent menu-2]
@@ -354,7 +374,7 @@
     
     (define (remove-choices tab-panel i)
       (send tab-panel delete i)
-      (set! choices-raw (delete-n choices-raw i))
+      (set! choices-raw (list-remove-n choices-raw i))
       (_update-choices tab-panel choices-raw 0))
     
     ; Tab Panel
@@ -395,6 +415,12 @@
     ; TODO: replace button% by control% when using bitmaps
     (new button%
          [parent tool-bar-panel]
+         [label "Select"]
+         [callback (lambda (button event)
+                     (send graph-canvas set-tool 'select))])
+    
+    (new button%
+         [parent tool-bar-panel]
          [label tool-label-1]
          [min-width tool-bar-size]
          [min-height tool-bar-size]
@@ -429,25 +455,8 @@
          [stretchable-height #f]
          [callback (lambda (button event)
                      (send graph-canvas set-tool 'delete-connection))])
-    (new button%
-         [parent tool-bar-panel]
-         [label tool-label-5]
-         [min-width tool-bar-size]
-         [min-height tool-bar-size]
-         [stretchable-width #f]
-         [stretchable-height #f]
-         [callback (lambda (button event)
-                     (send graph-canvas set-tool 'move-node))])
 
     (define graph-model-level 0)
-
-    (define (graph-solver-run solver)
-      (define graph (send graph-canvas get-graph))
-      (define root-node-id (send graph-canvas get-root-node-id))
-      (define goal-node-id (send graph-canvas get-goal-node-id))
-      (cond [(and (integer? root-node-id) (integer? goal-node-id))
-             (solver graph graph-model-level root-node-id goal-node-id)]
-            [else "Root or Goal Node are not set!"]))
 
     (define tool-algorithm-choice
       (new choice%	 
@@ -459,14 +468,28 @@
          [parent tool-bar-panel]
          [label "Run Algorithm"]
          [callback (lambda (button event)
-                     (define agol (case (send tool-algorithm-choice get-selection)
-                                    [(0) void]
-                                    [(1) graph-solver-bfs]
-                                    [(2) graph-solver-bfs]))
-                     (displayln (graph-solver-run agol)))])
+                     (define solver (case (send tool-algorithm-choice get-selection)
+                                      [(0) void]
+                                      [(1) graph-solver-bfs]
+                                      [(2) graph-solver-dfs]))
+
+                     (define graph (send graph-canvas get-graph))
+                     (define root-node-id (send graph-canvas get-root-node-id))
+                     (define goal-node-id (send graph-canvas get-goal-node-id))
+                     
+                     (cond [(and (integer? root-node-id) (integer? goal-node-id))
+                            (define timer (timer-start))
+                            (define output (solver graph graph-model-level root-node-id goal-node-id))
+                            (define time (timer-stop timer))
+                            (display "Output:\t")
+                            (displayln output)
+                            (display "Time:\t")
+                            (display time)
+                            (displayln "ms")]
+                           [else "Root or Goal Node are not set!"]))])
 
     ; Graph
-    (define graph-canvas (new graph-canvas% [parent view-panel] [style (list 'no-focus)]))
+    (define graph-canvas (new graph-canvas% [parent view-panel] #|[style (list 'no-focus)]|#))
   
     (send graph-canvas set-canvas-background (make-object color% 25 25 25))
 

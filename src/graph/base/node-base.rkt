@@ -8,7 +8,10 @@
 
 ; Node get
 (define (node-get-connection _node id)
-  (list-search-first (node-connections _node) (lambda (con) (eq? (connection-id con) id))))
+  (list-search (node-connections _node) (lambda (con) (eq? (connection-id con) id))))
+
+(define (node-has-connection? _node id)
+  (not (eq? (node-get-connection _node id) #f)))
 
 ; Node set
 (define (node-set-id _node new-id)

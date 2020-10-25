@@ -9,12 +9,13 @@
 ; nodes delete
 (define (nodes-delete-node nodes id)
   (cond [(empty? nodes) '()]
-        [(eq? (node-id (car nodes)) id) (rest nodes)]
+        [(eq? (node-id (car nodes)) id) (nodes-delete-node (rest nodes) id)]
         [else (cons (node-delete-connection (car nodes) id) (nodes-delete-node (rest nodes) id))]))
 
-(define (nodes-update-ids nodes n)
-  (cond [(empty? nodes) '()]
-        [else (cons (node-set-id (car nodes) n) (nodes-update-ids (rest nodes) (+ n 1)))]))
+(define (nodes-delete-connection nodes id)
+  (if (empty? nodes)
+      '()
+      (cons (node-delete-connection (car nodes) id) (nodes-delete-connection (rest nodes) id))))
 
 ; nodes apply
 (define (nodes-apply-node nodes id proc)
@@ -35,4 +36,12 @@
 
 ; graph get valid id
 (define (graph-get-valid-id graph)
-  (length (graph-nodes graph)))
+  (define nodes (graph-nodes graph))
+  (define l (build-list (+ (length nodes) 1) (lambda (id) (nodes-contain-id nodes id))))
+
+  (list-search-ref l (lambda (x) (not x)) 0))
+
+(define (nodes-contain-id nodes id)
+  (cond [(empty? nodes) #f]
+        [(eq? (node-id (car nodes)) id) #t]
+        [else (nodes-contain-id (rest nodes) id)]))

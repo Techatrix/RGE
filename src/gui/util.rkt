@@ -5,7 +5,8 @@
 
 (provide graph-set-weights
          graph-calculate-weights
-         graph-get-extend)
+         graph-get-extend
+         nodes-get-selection)
 
 (define (graph-set-weights _graph proc)
   (graph (map (lambda (node)
@@ -38,3 +39,9 @@
                (min min-y (- (vec2-y p) 30))
                (max max-x (+ (vec2-x p) 30))
                (max max-y (+ (vec2-y p) 30)))]))
+
+(define (nodes-get-selection nodes rect-pos rect-size circle-r)
+  (cond [(empty? nodes) '()]
+        [(rect-circle-intersect? rect-pos rect-size (node-position (car nodes)) circle-r)
+         (cons (node-id (car nodes)) (nodes-get-selection (rest nodes) rect-pos rect-size circle-r))]
+        [else (nodes-get-selection (rest nodes) rect-pos rect-size circle-r)]))
