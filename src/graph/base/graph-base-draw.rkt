@@ -10,20 +10,25 @@
 (provide draw-graph)
 
 ; draw graph
-(define (draw-graph graph canvas-dc draw-ids? draw-weights?)
+(define (draw-graph graph canvas-dc selections draw-ids? draw-weights?)
   (send canvas-dc set-brush color-white 'solid)
   (send canvas-dc set-pen color-white 1 'solid)
   (draw-nodes-connections graph (graph-nodes graph) canvas-dc draw-weights?)
-  (draw-nodes-point (graph-nodes graph) canvas-dc draw-ids?))
+  (draw-nodes-point (graph-nodes graph) canvas-dc selections draw-ids?))
 
 ; draw nodes point
-(define (draw-nodes-point nodes canvas-dc draw-ids?)
+(define (draw-nodes-point nodes canvas-dc selections draw-ids?)
   (cond [(empty? nodes)]
-        [else (draw-node-point (car nodes) canvas-dc draw-ids?)
-              (draw-nodes-point (rest nodes) canvas-dc draw-ids?)]))
+        [else (draw-node-point (car nodes) canvas-dc selections draw-ids?)
+              (draw-nodes-point (rest nodes) canvas-dc selections draw-ids?)]))
 
-(define (draw-node-point node canvas-dc draw-ids?)
+(define (draw-node-point node canvas-dc selections draw-ids?)
   (define pos (node-position node))
+  
+  (if (not (list-search-eq selections (node-id node)))
+      (send canvas-dc set-pen color-white 1 'solid)
+      (send canvas-dc set-pen color-red 2 'solid))
+
   (draw-point canvas-dc pos 50)
   (when draw-ids?
     (define text (number->string (node-id node)))
