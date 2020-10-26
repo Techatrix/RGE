@@ -47,4 +47,12 @@
         [else (cons (car states) (_graph-state-discover-node (rest states) n discoverer-id))]))
 
 ; graph-state->route
-(define (graph-state->route graph-state) graph-state)
+(define (graph-state->route graph-state root-node-id goal-node-id)
+  (_graph-state->route graph-state root-node-id goal-node-id))
+
+(define (_graph-state->route graph-state root-node-id current-node-id)
+  (define state (graph-state-search-node graph-state current-node-id))
+  (define discoverer-id (node-state-discoverer-id state))
+  (cond [(eq? discoverer-id root-node-id) (list root-node-id current-node-id)]
+        [else (append (_graph-state->route graph-state root-node-id discoverer-id)
+                      (list current-node-id))]))

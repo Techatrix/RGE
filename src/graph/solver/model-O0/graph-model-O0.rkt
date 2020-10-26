@@ -11,7 +11,11 @@
 (define (bfs graph root-node-id goal-node-id)
   (define state (graph-state-build graph))
   (define new-state (graph-state-discover-node state root-node-id root-node-id))
-  (graph-state->route (bfs-call graph (list root-node-id) new-state goal-node-id)))
+  
+  (define result (bfs-call graph (list root-node-id) new-state goal-node-id))
+  (if (not (eq? result 'no-path))
+      (graph-state->route result root-node-id goal-node-id)
+      'no-path))
 
 (define (bfs-call graph queue state goal-node-id)
   (cond [(empty? queue) 'no-path]
@@ -43,7 +47,7 @@
     (dfs-explore-node graph state root-node-id root-node-id goal-node-id))
   
   (if (eq? found #t)
-      (graph-state->route new-state)
+      (graph-state->route new-state root-node-id goal-node-id)
       'no-path))
 
 (define (dfs-explore-node graph state origin-node-id node-id goal-node-id)

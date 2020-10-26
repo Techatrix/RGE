@@ -21,44 +21,51 @@
 
 
 ; list apply
-(define (list-apply l proc)
-  (cond [(empty? l) '()]
-        [else (cons (proc (car l)) (list-apply (rest l) proc))]))
+(define (list-apply lst proc)
+  (if (empty? lst)
+      '()
+      (cons (proc (car lst)) (list-apply (rest lst) proc))))
 
 ; list search
-(define (list-search-eq l v)
-  (list-search l (lambda (e) (eq? v e))))
+(define (list-search-eq lst v)
+  (list-search lst (lambda (e) (eq? v e))))
 
-(define (list-search l proc)
-  (cond [(empty? l) #f]
-        [(proc (car l)) (car l)]
-        [else (list-search (rest l) proc)]))
+(define (list-search lst proc)
+  (cond [(empty? lst) #f]
+        [(proc (car lst)) (car lst)]
+        [else (list-search (rest lst) proc)]))
 
-(define (list-search-ref l proc n)
-  (cond [(empty? l) #f]
-        [(proc (car l)) n]
-        [else (list-search-ref (rest l) proc (+ n 1))]))
+(define (list-search-ref lst proc [n 0])
+  (cond [(empty? lst) #f]
+        [(proc (car lst)) n]
+        [else (list-search-ref (rest lst) proc (+ n 1))]))
 
 ; list remove
-(define (list-remove-eq l v)
-  (list-remove l (lambda (e) (eq? v e))))
+(define (list-remove-eq lst v)
+  (list-remove lst (lambda (e) (eq? v e))))
 
-(define (list-remove l proc)
-  (cond [(empty? l) '()]
-        [(proc (car l)) (rest l)]
-        [else (cons (car l) (list-remove (rest l) proc))]))
+(define (list-remove lst proc)
+  (cond [(empty? lst) '()]
+        [(proc (car lst)) (rest lst)]
+        [else (cons (car lst) (list-remove (rest lst) proc))]))
 
 ; list removes element at position n
-(define (list-remove-n l n)
-  (cond [(empty? l) '()]
-        [(zero? n) (rest l)]
-        [else (cons (car l) (list-remove-n (rest l) (- n 1)))]))
+(define (list-remove-n lst n)
+  (cond [(empty? lst) '()]
+        [(zero? n) (rest lst)]
+        [else (cons (car lst) (list-remove-n (rest lst) (- n 1)))]))
 
 ; list remove last element
-(define (list-remove-last l)
-  (cond [(null? (cdr l)) '()]
-        [else (cons (car l) (list-remove-last (cdr l)))]))
+(define (list-remove-last lst)
+  (cond [(null? (cdr lst)) '()]
+        [else (cons (car lst) (list-remove-last (cdr lst)))]))
 
 (define (list-for-recur v lst proc)
   (cond [(empty? lst) v]
         [else (list-for-recur (proc v (car lst)) (rest lst) proc)]))
+
+(define (list-append-new lst1 lst2)
+  (cond [(empty? lst2) lst1]
+        [(not (list-search-eq lst1 (car lst2)))
+         (cons (car lst2) (list-append-new lst1 (rest lst2)))]
+        [else (list-append-new lst1 (rest lst2))]))

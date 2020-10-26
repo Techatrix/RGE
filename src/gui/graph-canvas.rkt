@@ -27,7 +27,7 @@
     (define selection-box (list (vec2 0 0) (vec2 0 0)))
     (define selections '())
     (define selecting? #f)
-    (define copy-node (void))
+    (define copy-nodes '())
 
     ; getter
     (define/public (get-graph) graph)
@@ -41,7 +41,6 @@
 
     (define/public (set-graph new-graph)
       (set! graph (if (void? new-graph) (graph-make) new-graph))
-      ; (displayln graph)
       (send this refresh))
 
     (define/private (set-selections new-selections)
@@ -72,7 +71,7 @@
       (send this refresh))
 
     (define/public (reset-graph)
-      (set! copy-node (void))
+      (set! copy-nodes '())
       (set! root-node-id (void))
       (set! goal-node-id (void))
       (set-graph (graph-make)))
@@ -143,17 +142,24 @@
     (define/private (get-mouse-pos-view)
       (apply-transform (send this get-dc) mouse-pos))
     ; tools
-    (define/private (tool-add-node data)
-      (set-graph (graph-add-node graph data)))
+    (define/private (tool-add-node)
+      (set-graph (graph-add-node graph #:position (get-mouse-pos-view))))
 
     (define/private (tool-add-node-copy node)
-      (set-graph (graph-add-node-pc graph (get-mouse-pos-view) (node-connections node))))
+      (set-graph (graph-add-node graph
+                                 #:position (get-mouse-pos-view)
+                                 #:connections (node-connections node))))
 
+    (define/private (tool-delete-nodes node-ids)
+      (set-graph
+       (list-for-recur graph node-ids
+        (lambda (_graph id)
+          (cond [(eq? root-node-id id) (set-root-node-id #f)]
+                [(eq? goal-node-id id) (set-goal-node-id #f)])
+          (graph-delete-node _graph id)))))
+    
     (define/private (tool-delete-node node)
-      (define id (node-id node))
-      (cond [(eq? root-node-id id) (set-root-node-id #f)]
-            [(eq? goal-node-id id) (set-goal-node-id #f)])
-      (set-graph (graph-delete-node graph (node-id node))))
+      (tool-delete-nodes (list (node-id node))))
 
     (define/private (tool-add-connection id1 id2)
       (when (and (not (eq? id1 id2)) (not (graph-has-connection graph id1 id2)))
@@ -165,7 +171,7 @@
     ; draw
     (define/private (draw-node-highlight dc color node-id)
       (define node (graph-get-node graph node-id))
-      (when (not (not node))
+      (when (not (not node)) ; big brain move!
         (define p1 (node-position node))
         (send dc set-brush color 'solid)
         (send dc set-pen color 0 'transparent)
@@ -244,35 +250,38 @@
       (new menu-item%
            [label "add Node"]
            [parent popup]
-           [callback (lambda (item event) (on-paste))]
+           [callback (lambda (item event) (tool-add-node))]
            [shortcut #\B])
       (new separator-menu-item% [parent popup])
       (define popup-paste
         (new menu-item%
              [label "Paste"]
              [parent popup]
-             [callback (lambda (item event) 
-                         (tool-add-node-copy copy-node))]))
-      (send popup-paste enable (node? copy-node)))
+             [callback (lambda (item event) (on-paste))]))
+      (send popup-paste enable (not (empty? copy-nodes))))
     ; extern events
-    (define/public (on-cut)
-      (on-node-press-single
-       (lambda (node)
-         (set! copy-node node)
-         (tool-delete-node node))
-       void))
-    (define/public (on-copy)
-      (on-node-press-single
-       (lambda (node)
-         (set! copy-node node))
-       void))
-    (define/public (on-paste)
-      (tool-add-node (get-mouse-pos-view)))
-    (define/public (on-delete)
-      (on-node-press-single
-       (lambda (node)
-         (tool-delete-node node))
-       void))
+    (define/private (action-on-selections proc)
+      (cond [(empty? selections)
+             (on-node-press-single
+              (lambda (node) (proc (list node)))
+              (lambda () (proc copy-nodes)))]
+            [else
+             (define nodes (list-for-recur '() selections (lambda (nodes id)
+                                              (cons (graph-get-node graph id) nodes))))
+             (proc nodes)]))
+    (define/public (on-cut) (action-on-selections (lambda (nodes)
+                                                   (set! copy-nodes nodes)
+                                                   (tool-delete-nodes selections))))
+    (define/public (on-copy) (action-on-selections (lambda (nodes)
+                                                     (set! copy-nodes nodes))))
+    (define/public (on-paste) ; TODO: rework
+      (action-on-selections
+       (lambda (nodes)
+         (list-apply nodes (lambda (node) (tool-add-node-copy node))))))
+    (define/public (on-delete) ; TODO: rework
+      (action-on-selections
+       (lambda (nodes)
+         (list-apply nodes (lambda (node) (tool-delete-node node))))))
     ; event handling
     (define/private (on-node-press-single proc else-proc)
       (define node (graph-search-node-by-closest-position graph (get-mouse-pos-view)))
@@ -332,7 +341,7 @@
                 (set! selection-box (list mouse-pos-view mouse-pos-view))
                 (cond [(send event get-control-down) selections]
                       [else '()]))))]
-           [(add-node) (tool-add-node mouse-pos-view)]
+           [(add-node) (tool-add-node)]
            [(delete-node) (on-node-press-single
                            (lambda (node) (tool-delete-node node)) void)]
            [(add-connection) (on-node-press-double
@@ -347,8 +356,18 @@
               (define-values (start-x end-x start-y end-y) (rect-get-points selection-box))
               (define rect-pos (vec2 start-x start-y))
               (define rect-size (vec2-sub (vec2 end-x end-y) rect-pos))
-      
-              (set-selections (nodes-get-selection (graph-nodes graph) rect-pos rect-size 25)))
+
+              (define new-selections (nodes-get-selection (graph-nodes graph) rect-pos rect-size 25))
+
+              (set-selections
+               (if (send event get-control-down)
+                   (if (send event get-shift-down)
+                       (list-for-recur
+                        selections
+                        new-selections
+                        (lambda (_selections id) (list-remove-eq _selections id)))
+                       (list-append-new selections new-selections))
+                   new-selections)))
             
             (set! selecting? #f)
             (send this refresh)])]
