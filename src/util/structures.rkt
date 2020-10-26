@@ -19,7 +19,6 @@
 
 (define (vec2-scalar v scalar) (vec2 (* (vec2-x v) scalar) (* (vec2-y v) scalar)))
 (define (vec2-dot v1 v2) (+ (* (vec2-x v1) (vec2-x v2)) (* (vec2-y v1) (vec2-y v2))))
-(define (vec2-cross v1 v2) (error "No Implementation"))
 
 (define (vec2-dist v1 v2)
   (sqrt (+ (expt (- (vec2-x v1) (vec2-x v2)) 2)

@@ -11,13 +11,12 @@
 (define (graph-make) (graph (list)))
 
 ; Graph add/delete
-(define (graph-add-node _graph data)
-  (define new-node (if (vec2? data) (node (graph-get-valid-id _graph) data '()) data))
-  (graph (append (graph-nodes _graph) (list new-node))))
 
-(define (graph-add-node-pc _graph position connections)
-  (graph (append (graph-nodes _graph)
-                 (list (node (graph-get-valid-id _graph) position connections)))))
+(define (graph-add-node _graph
+                        #:id [id (graph-get-valid-id _graph)]
+                        #:position [position (vec2 0 0)]
+                        #:connections [connections '()])
+  (graph (append (graph-nodes _graph) (list (node id position connections)))))
 
 (define (graph-delete-node _graph id)
   (graph (nodes-delete-node (graph-nodes _graph) id)))

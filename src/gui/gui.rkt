@@ -468,28 +468,33 @@
          [parent tool-bar-panel]
          [label "Run Algorithm"]
          [callback (lambda (button event)
-                     (define solver (case (send tool-algorithm-choice get-selection)
-                                      [(0) void]
-                                      [(1) graph-solver-bfs]
-                                      [(2) graph-solver-dfs]))
-
-                     (define graph (send graph-canvas get-graph))
-                     (define root-node-id (send graph-canvas get-root-node-id))
-                     (define goal-node-id (send graph-canvas get-goal-node-id))
+                     (define id (send tool-algorithm-choice get-selection))
+                     (define message
+                       (cond [(not (zero? id))
+                            (define solver
+                              (case id
+                                [(0) void]
+                                [(1) graph-solver-bfs]
+                                [(2) graph-solver-dfs]))
                      
-                     (cond [(and (integer? root-node-id) (integer? goal-node-id))
-                            (define timer (timer-start))
-                            (define output (solver graph graph-model-level root-node-id goal-node-id))
-                            (define time (timer-stop timer))
-                            (display "Output:\t")
-                            (displayln output)
-                            (display "Time:\t")
-                            (display time)
-                            (displayln "ms")]
-                           [else "Root or Goal Node are not set!"]))])
+                            (define graph (send graph-canvas get-graph))
+                            (define root-node-id (send graph-canvas get-root-node-id))
+                            (define goal-node-id (send graph-canvas get-goal-node-id))
+
+                            (cond [(and (integer? root-node-id) (integer? goal-node-id))
+                                   (define timer (timer-start))
+                                   (define output (solver graph
+                                                          graph-model-level
+                                                          root-node-id
+                                                          goal-node-id))
+                                   (define time (timer-stop timer))
+                                   (format "Output:\t ~a\nTime:\t~ams" output time)]
+                                  [else "Root or Goal Node are not set!"])]
+                           [else "No Algorithm selected!"]))
+                     (displayln message))])
 
     ; Graph
-    (define graph-canvas (new graph-canvas% [parent view-panel] #|[style (list 'no-focus)]|#))
+    (define graph-canvas (new graph-canvas% [parent view-panel] [style (list 'no-focus)]))
   
     (send graph-canvas set-canvas-background (make-object color% 25 25 25))
 

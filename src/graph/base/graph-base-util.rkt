@@ -39,7 +39,7 @@
   (define nodes (graph-nodes graph))
   (define l (build-list (+ (length nodes) 1) (lambda (id) (nodes-contain-id nodes id))))
 
-  (list-search-ref l (lambda (x) (not x)) 0))
+  (list-search-ref l (lambda (x) (not x))))
 
 (define (nodes-contain-id nodes id)
   (cond [(empty? nodes) #f]
