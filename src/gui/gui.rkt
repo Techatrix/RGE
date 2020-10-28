@@ -142,18 +142,18 @@
          [shortcut 'add]
          [callback
           (lambda (item event)
-            (define width (send graph-canvas get-width))
-            (define height (send graph-canvas get-height))
-            (send graph-canvas view-zoom (vec2 (/ width 2) (/ height 2)) 1.1))])
+            (define size (vec2 (send graph-canvas get-width)
+                               (send graph-canvas get-height)))
+            (send graph-canvas zoom (vec2-scalar size 0.5) 1.1))])
     (new menu-item%
          [parent menu-3]
          [label "Zoom out"]
          [shortcut 'subtract]
          [callback
           (lambda (item event)
-            (define width (send graph-canvas get-width))
-            (define height (send graph-canvas get-height))
-            (send graph-canvas view-zoom (vec2 (/ width 2) (/ height 2)) (/ 1 1.1)))])
+            (define size (vec2 (send graph-canvas get-width)
+                               (send graph-canvas get-height)))
+            (send graph-canvas zoom (vec2-scalar size 0.5) (/ 1 1.1)))])
     (new separator-menu-item% [parent menu-3])
     (new menu-item%
          [parent menu-3]

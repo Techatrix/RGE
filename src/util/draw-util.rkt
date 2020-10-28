@@ -23,31 +23,17 @@
   (send dc draw-line (vec2-x pos1) (vec2-y pos1) (vec2-x pos2) (vec2-y pos2)))
 
 (define (draw-arrow dc pos1 pos2)
-  (define arrow-length 50)
-  (define arrow-angle 0.5)
-  (draw-line dc pos1 pos2)
+  (define AB (vec2-sub pos2 pos1))
+  (define l (vec2-length AB))
+  (when (< 30 l)
+        (define arrow-length (/ 80 (+ 1 (exp (+ (* (/ -1 100) l) 2)))))
+        (define arrow-angle (/ pi 6))
 
-  (define delta (vec2-sub pos2 pos1))
-  (cond [(eq? (vec2-x delta) 0)
-         (define alpha (- arrow-angle (/ pi 2)))
+        (define origin (vec2-add pos1 (vec2-scalar (vec2-norm AB) 30)))
+        (define target (vec2-add pos1 (vec2-scalar (vec2-norm AB) (- l 30))))
+        (define dir1 (vec2-scalar (vec2-norm (vec2-rotate AB (- pi arrow-angle))) arrow-length))
+        (define dir2 (vec2-scalar (vec2-norm (vec2-rotate AB (+ pi arrow-angle))) arrow-length))
 
-         (define dx (* arrow-length (sin alpha)))
-         (define dy (* arrow-length (cos alpha)))
-
-         (draw-line dc pos2 (vec2-add pos2 (vec2 dx dy)))
-         ]
-        [else (define beta (atan (/ (- (vec2-y delta)) (vec2-x delta))))
-              (define alpha1 (- (+ arrow-angle beta) (/ pi 2)))
-
-              (define dx1 (* arrow-length (sin alpha1)))
-              (define dy1 (* arrow-length (cos alpha1)))
-
-              (draw-line dc pos2 (vec2-add pos2 (vec2 dx1 dy1)))
-
-              (define alpha2 (- beta arrow-angle (/ pi 2)))
-
-              (define dx2 (* arrow-length (sin alpha2)))
-              (define dy2 (* arrow-length (cos alpha2)))
-
-              (draw-line dc pos2 (vec2-add pos2 (vec2 dx2 dy2)))
-              ]))
+        (draw-line dc origin target)
+        (draw-line dc target (vec2-add target dir1))
+        (draw-line dc target (vec2-add target dir2))))
