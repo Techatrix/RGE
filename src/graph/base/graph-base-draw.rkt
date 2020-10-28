@@ -70,4 +70,5 @@
     (define beta (+ (atan (- (vec2-y pos3)) (vec2-x pos3)) (/ pi 2)))
     (define gamma (+ alpha beta))
     (define l (sqrt (+ (* a a) (* m m))))
-    (vec2-add (vec2-scalar (vec2 (sin gamma) (cos gamma)) l) pos1)))
+    (vec2-add (vec2-scalar (vec2 (sin gamma) (cos gamma)) l) pos1))
+  pos1)

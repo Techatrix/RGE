@@ -1,5 +1,6 @@
 #lang racket/gui
 
+(require "view-canvas.rkt")
 (require "../graph/base/base.rkt")
 (require "../util/util.rkt")
 (require "../util/draw-util.rkt")
@@ -10,7 +11,7 @@
 (provide graph-canvas%)
 
 (define graph-canvas%
-  (class canvas%
+  (class view-canvas%
     (init-field [tool-id 'none]
                 [graph (graph-make)]
                 [root-node-id #f]
@@ -75,66 +76,6 @@
       (set! root-node-id (void))
       (set! goal-node-id (void))
       (set-graph (graph-make)))
-    
-    ; Graph View
-    (define/private (view-get-translation)
-      (define transform (send (send this get-dc) get-initial-matrix))
-      (vec2 (vector-ref transform 4) (vector-ref transform 5)))
-
-    (define/private (view-get-scale)
-      (define transform (send (send this get-dc) get-initial-matrix))
-      (vec2 (vector-ref transform 0) (vector-ref transform 3)))
-
-    (define/private (view-set-translation dx dy)
-      (define m (send (send this get-dc) get-initial-matrix))
-      (define new-m
-        (vector (vector-ref m 0)
-                (vector-ref m 1)
-                (vector-ref m 2)
-                (vector-ref m 3) dx dy))
-      (send (send this get-dc) set-initial-matrix new-m))
-
-    (define/private (view-set-scale x-scale y-scale)
-      (define m (send (send this get-dc) get-initial-matrix))
-      (define new-m
-        (vector x-scale
-                (vector-ref m 1)
-                (vector-ref m 2)
-                y-scale
-                (vector-ref m 4)
-                (vector-ref m 5)))
-      (send (send this get-dc) set-initial-matrix new-m))
-    
-    (define/private (view-translate dx dy)
-      (send (send this get-dc) transform (vector 1 0 0 1 dx dy))
-      (send this refresh))
-
-    (define/private (view-scale x-scale y-scale)
-      (send (send this get-dc) transform (vector x-scale 0 0 y-scale 0 0))
-      (send this refresh))
-
-    (define/public (view-zoom pos delta)
-      (define mx (vec2-x pos))
-      (define my (vec2-y pos))
-
-      (define translation (view-get-translation))
-      (define xoff (vec2-x translation))
-      (define yoff (vec2-y translation))
-
-      (define scale (vec2-x (view-get-scale)))
-      (define limited-delta 
-        (cond [(> (* scale delta) 2) (/ 2 scale)]
-              [(< (* scale delta) 0.25) (/ 0.25 scale)]
-              [else delta]))
-
-      (view-scale limited-delta limited-delta)
-
-      ; xoff = (xoff-mx) * delta + mx
-      ; yoff = (yoff-my) * delta + my
-      (define dx (+ (* (- xoff mx) limited-delta) mx))
-      (define dy (+ (* (- yoff my) limited-delta) my))
-      (view-set-translation dx dy)
-      (send this refresh))
 
     ; Mouse position
     (define/private (get-mouse-pos event)
@@ -313,16 +254,17 @@
                        (send this refresh)]
                       [else
                        (set-graph
-                        (list-for-recur graph
-                                        selections
-                                        (lambda (g id)
-                                          (define pos (graph-get-node-position g id))
-                                          (define new-pos (vec2-add pos (vec2-div delta-mouse-pos
-                                                                                  (view-get-scale))))
-                                          (graph-set-node-position g id new-pos))))])]
+                        (list-for-recur
+                         graph
+                         selections
+                         (lambda (g id)
+                           (define pos (graph-get-node-position g id))
+                           (define new-pos (vec2-add pos (vec2-div delta-mouse-pos
+                                                                   (send this get-scale))))
+                           (graph-set-node-position g id new-pos))))])]
                [(send event get-middle-down)
-                (define delta (vec2-div delta-mouse-pos (view-get-scale)))
-                (view-translate (vec2-x delta) (vec2-y delta))])]
+                (define delta (vec2-div delta-mouse-pos (send this get-scale)))
+                (send this translate (vec2-x delta) (vec2-y delta))])]
         [(left-down)
          (case tool-id
            [(select)
@@ -381,7 +323,7 @@
     (define/override (on-char event)
       (define key-code (send event get-key-code))
       (cond [(or (eq? key-code 'wheel-up) (eq? key-code 'wheel-down))
-             (view-zoom mouse-pos (if (eq? key-code 'wheel-up) 1.1 (/ 1 1.1)))]))
+             (send this zoom mouse-pos (if (eq? key-code 'wheel-up) 1.1 (/ 1 1.1)))]))
 
     ; canvas init
     (super-new
