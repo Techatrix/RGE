@@ -44,7 +44,7 @@
       (set! graph (if (void? new-graph) (graph-make) new-graph))
       (send this refresh))
 
-    (define/private (set-selections new-selections)
+    (define/public (set-selections new-selections)
       (set! selections new-selections)
       (send this refresh))
 
@@ -78,32 +78,68 @@
       (set-graph (graph-make)))
 
     ; Mouse position
-    (define/private (get-mouse-pos event)
-      (vec2 (send event get-x) (send event get-y)))
     (define/private (get-mouse-pos-view)
       (apply-transform (send this get-dc) mouse-pos))
-    ; tools
-    (define/private (tool-add-node)
-      (set-graph (graph-add-node graph #:position (get-mouse-pos-view))))
+    ; single actions
+    (define/private (action-add-node position) (action-add-nodes #:positions (list position)))
+    (define/private (action-delete-node node-id) (action-delete-nodes (list node-id)))
+    (define/private (action-copy-node node) (action-copy-nodes (list node)))
+    (define/private (action-move-node node-id) (action-move-nodes (list node-id)))
+    ; multi actions
+    (define/private (action-add-nodes
+                     #:positions [positions #f]
+                     #:connections-list [connections-list #f])
+      (define proc
+        (lambda (_graph _positions _connections-list)
+          (define-values (_position _rest-positions)
+            (if (or (not _positions) (empty? _positions))
+                (values #f #f)
+                (values (car _positions) (rest _positions))))
 
-    (define/private (tool-add-node-copy node)
-      (set-graph (graph-add-node graph
-                                 #:position (get-mouse-pos-view)
-                                 #:connections (node-connections node))))
+          (define-values (_connections _rest-connections)
+            (if (or (not _connections-list) (empty? _connections-list))
+                (values #f #f)
+                (values (car _connections-list) (rest _connections-list))))
+        
+          (cond [(and (not _position) (not _connections)) _graph]
+                [else (define new-graph (graph-add-node _graph
+                                                        #:position _position
+                                                        #:connections _connections))
+                      (proc new-graph _rest-positions _rest-connections)])))
+      (set-graph (proc graph positions connections-list)))
 
-    (define/private (tool-delete-nodes node-ids)
+    (define/private (action-delete-nodes node-ids)
+      (define data
+        (foldl (lambda (id data)
+                 (cond [(eq? root-node-id id) (set-root-node-id #f)]
+                       [(eq? goal-node-id id) (set-goal-node-id #f)])
+                 (list (graph-delete-node (car data) id)
+                       (remq id (cadr data))))
+               (list graph selections) node-ids))
+      (set-graph (car data))
+      (set-selections (cadr data)))
+
+    (define/private (action-copy-nodes nodes)
+      (define center (nodes-get-center nodes))
+      (define mouse-pos-view (get-mouse-pos-view))
+      (define positions (map (lambda (node)
+                               (vec2-add mouse-pos-view (vec2-sub (node-position node) center))) nodes))
+      (define connections-list (map (lambda (node) (node-connections node)) nodes))
+      (action-add-nodes #:positions positions #:connections-list connections-list))
+
+    (define/private (action-move-nodes node-ids delta-mouse-pos)
       (set-graph
-       (list-for-recur graph node-ids
-        (lambda (_graph id)
-          (cond [(eq? root-node-id id) (set-root-node-id #f)]
-                [(eq? goal-node-id id) (set-goal-node-id #f)])
-          (graph-delete-node _graph id)))))
-    
-    (define/private (tool-delete-node node)
-      (tool-delete-nodes (list (node-id node))))
+       (foldl (lambda (id _graph)
+                (define position (graph-get-node-position _graph id))
+                (define new-position (vec2-add position (vec2-div delta-mouse-pos
+                                                                  (send this get-scale))))
+                (graph-set-node-position _graph id new-position))
+              graph node-ids)))
 
+    ; tools old    
     (define/private (tool-add-connection id1 id2)
       (when (and (not (eq? id1 id2)) (not (graph-has-connection graph id1 id2)))
+        ; TODO: move check to on-node-press-double
         (set-graph (graph-set-node-add-connection graph id1 id2))))
 
     (define/private (tool-delete-connection id1 id2)
@@ -191,7 +227,7 @@
       (new menu-item%
            [label "add Node"]
            [parent popup]
-           [callback (lambda (item event) (tool-add-node))]
+           [callback (lambda (item event) (action-add-node (get-mouse-pos-view)))]
            [shortcut #\B])
       (new separator-menu-item% [parent popup])
       (define popup-paste
@@ -201,49 +237,44 @@
              [callback (lambda (item event) (on-paste))]))
       (send popup-paste enable (not (empty? copy-nodes))))
     ; extern events
-    (define/private (action-on-selections proc)
+    (define/private (get-selection-nodes)
       (cond [(empty? selections)
              (on-node-press-single
-              (lambda (node) (proc (list node)))
-              (lambda () (proc copy-nodes)))]
-            [else
-             (define nodes (list-for-recur '() selections (lambda (nodes id)
-                                              (cons (graph-get-node graph id) nodes))))
-             (proc nodes)]))
-    (define/public (on-cut) (action-on-selections (lambda (nodes)
-                                                   (set! copy-nodes nodes)
-                                                   (tool-delete-nodes selections))))
-    (define/public (on-copy) (action-on-selections (lambda (nodes)
-                                                     (set! copy-nodes nodes))))
-    (define/public (on-paste) ; TODO: rework
-      (action-on-selections
-       (lambda (nodes)
-         (list-apply nodes (lambda (node) (tool-add-node-copy node))))))
-    (define/public (on-delete) ; TODO: rework
-      (action-on-selections
-       (lambda (nodes)
-         (list-apply nodes (lambda (node) (tool-delete-node node))))))
+              (lambda (node) (list node))
+              (lambda () copy-nodes))]
+            [else (foldl (lambda (id nodes) (cons (graph-get-node graph id) nodes)) '() selections)]))
+    (define/public (on-cut)
+      (set! copy-nodes (get-selection-nodes))
+      (action-delete-nodes selections))
+    (define/public (on-copy) (set! copy-nodes (get-selection-nodes)))
+    (define/public (on-paste) (action-copy-nodes copy-nodes))
+    (define/public (on-delete) (action-delete-nodes selections))
     ; event handling
     (define/private (on-node-press-single proc else-proc)
-      (define node (graph-search-node-by-closest-position graph (get-mouse-pos-view)))
-      (cond [(and (not (void? node))
-                  (< (vec2-dist (get-mouse-pos-view) (node-position node)) 25))
-             (proc node)]
-            [else (else-proc)]))
+      (define position (get-mouse-pos-view))
+      (define node (graph-search-node-by-comparison
+                    graph
+                    (lambda (node1 node2)
+                      (define dist1 (vec2-dist position (node-position node1)))
+                      (define dist2 (vec2-dist position (node-position node2)))
+                      (if (< dist1 dist2) node1 node2))))
+      (if (and (not (not node))
+               (< (vec2-dist (get-mouse-pos-view) (node-position node)) 25))
+          (proc node)
+          (else-proc)))
 
     (define/private (on-node-press-double proc)
       (on-node-press-single
        (lambda (node)
          (cond [(void? last-selection-id) (set! last-selection-id (node-id node))]
                [else (proc last-selection-id (node-id node))
-                     (set! last-selection-id (void))]))
-       void))
+                     (set! last-selection-id (void))])) void))
 
     ; event handling
     (define/override (on-event event)
       (define type (send event get-event-type))
       (set! p-mouse-pos mouse-pos)
-      (set! mouse-pos (get-mouse-pos event))
+      (set! mouse-pos (vec2 (send event get-x) (send event get-y)))
       (define mouse-pos-view (apply-transform (send this get-dc) mouse-pos))
       (define delta-mouse-pos (vec2-sub mouse-pos p-mouse-pos))
       (case type
@@ -252,16 +283,7 @@
                 (cond [selecting?
                        (set! selection-box (list (car selection-box) mouse-pos-view))
                        (send this refresh)]
-                      [else
-                       (set-graph
-                        (list-for-recur
-                         graph
-                         selections
-                         (lambda (g id)
-                           (define pos (graph-get-node-position g id))
-                           (define new-pos (vec2-add pos (vec2-div delta-mouse-pos
-                                                                   (send this get-scale))))
-                           (graph-set-node-position g id new-pos))))])]
+                      [else (action-move-nodes selections delta-mouse-pos)])]
                [(send event get-middle-down)
                 (define delta (vec2-div delta-mouse-pos (send this get-scale)))
                 (send this translate (vec2-x delta) (vec2-y delta))])]
@@ -283,9 +305,9 @@
                 (set! selection-box (list mouse-pos-view mouse-pos-view))
                 (cond [(send event get-control-down) selections]
                       [else '()]))))]
-           [(add-node) (tool-add-node)]
+           [(add-node) (action-add-node mouse-pos-view)]
            [(delete-node) (on-node-press-single
-                           (lambda (node) (tool-delete-node node)) void)]
+                           (lambda (node) (action-delete-node (node-id node))) void)]
            [(add-connection) (on-node-press-double
                               (lambda (id1 id2) (tool-add-connection id1 id2)))]
            [(delete-connection) (on-node-press-double

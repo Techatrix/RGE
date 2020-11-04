@@ -124,6 +124,14 @@
     (new separator-menu-item% [parent menu-2])
     (new menu-item%
          [parent menu-2]
+         [label "Select All"]
+         [shortcut #\A]
+         [callback
+          (lambda (item event)
+            (define nodes (graph-nodes (send graph-canvas get-graph)))
+            (send graph-canvas set-selections (map node-id nodes)))])
+    (new menu-item%
+         [parent menu-2]
          [label "Clear All"]
          [callback
           (lambda (item event)
@@ -162,7 +170,7 @@
           (lambda (item event)
             (define _graph (send graph-canvas get-graph))
             (when (< 1 (length (graph-nodes _graph)))
-              (define-values (x y w h) (graph-get-extend _graph))
+              (define-values (x y w h) (graph-nodes-get-extend _graph))
               (define width (send graph-canvas get-width))
               (define height (send graph-canvas get-height))
               (define x-scale (/ w width))
@@ -471,26 +479,26 @@
                      (define id (send tool-algorithm-choice get-selection))
                      (define message
                        (cond [(not (zero? id))
-                            (define solver
-                              (case id
-                                [(0) void]
-                                [(1) graph-solver-bfs]
-                                [(2) graph-solver-dfs]))
+                              (define solver
+                                (case id
+                                  [(0) void]
+                                  [(1) graph-solver-bfs]
+                                  [(2) graph-solver-dfs]))
                      
-                            (define graph (send graph-canvas get-graph))
-                            (define root-node-id (send graph-canvas get-root-node-id))
-                            (define goal-node-id (send graph-canvas get-goal-node-id))
+                              (define graph (send graph-canvas get-graph))
+                              (define root-node-id (send graph-canvas get-root-node-id))
+                              (define goal-node-id (send graph-canvas get-goal-node-id))
 
-                            (cond [(and (integer? root-node-id) (integer? goal-node-id))
-                                   (define timer (timer-start))
-                                   (define output (solver graph
-                                                          graph-model-level
-                                                          root-node-id
-                                                          goal-node-id))
-                                   (define time (timer-stop timer))
-                                   (format "Output:\t ~a\nTime:\t~ams" output time)]
-                                  [else "Root or Goal Node are not set!"])]
-                           [else "No Algorithm selected!"]))
+                              (cond [(and (integer? root-node-id) (integer? goal-node-id))
+                                     (define timer (timer-start))
+                                     (define output (solver graph
+                                                            graph-model-level
+                                                            root-node-id
+                                                            goal-node-id))
+                                     (define time (timer-stop timer))
+                                     (format "Output:\t ~a\nTime:\t~ams" output time)]
+                                    [else "Root or Goal Node are not set!"])]
+                             [else "No Algorithm selected!"]))
                      (displayln message))])
 
     ; Graph

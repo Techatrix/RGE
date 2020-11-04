@@ -5,7 +5,10 @@
 
 (provide graph-set-weights
          graph-calculate-weights
-         graph-get-extend
+         graph-nodes-get-center
+         nodes-get-center
+         graph-nodes-get-extend
+         nodes-get-extend
          nodes-get-selection)
 
 (define (graph-set-weights _graph proc)
@@ -25,7 +28,14 @@
      (define target (graph-get-node-position _graph (connection-id con)))
      (round (/ (vec2-dist origin target) 10)))))
 
-(define (graph-get-extend _graph)
+(define (graph-nodes-get-center _graph)
+  (nodes-get-center (graph-nodes _graph)))
+
+(define (nodes-get-center nodes)
+  (define-values (min-x min-y max-x max-y) (nodes-get-extend nodes +inf.0 +inf.0 -inf.0 -inf.0))
+  (vec2 (/ (+ min-x max-x) 2) (/ (+ min-y max-y) 2)))
+
+(define (graph-nodes-get-extend _graph)
   (define nodes (graph-nodes _graph))
   (define-values (min-x min-y max-x max-y) (nodes-get-extend nodes +inf.0 +inf.0 -inf.0 -inf.0))
   (values min-x min-y (- max-x min-x) (- max-y min-y)))

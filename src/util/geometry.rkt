@@ -40,7 +40,6 @@
   
   (cond [(vec2-eq? p1 p2) #f]
         [else
-         (define-values (x0 y0) (values (vec2-x circle-pos) (vec2-y circle-pos)))
          (define dx (- x2 x1))
          (define dy (- y2 y1))
 

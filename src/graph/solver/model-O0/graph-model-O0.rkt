@@ -1,6 +1,7 @@
 #lang racket
 
-(require "util.rkt")
+(require "graph-state.rkt")
+(require "queue.rkt")
 (require "../../base/base.rkt")
 (require "../../../util/util.rkt")
 
@@ -12,21 +13,20 @@
   (define state (graph-state-build graph))
   (define new-state (graph-state-discover-node state root-node-id root-node-id))
   
-  (define result (bfs-call graph (list root-node-id) new-state goal-node-id))
+  (define result (bfs-call graph (queue (list root-node-id)) new-state goal-node-id))
   (if (not (eq? result 'no-path))
       (graph-state->route result root-node-id goal-node-id)
       'no-path))
 
 (define (bfs-call graph queue state goal-node-id)
-  (cond [(empty? queue) 'no-path]
-        [else (define node (graph-get-node graph (last queue)))
-              (define id (node-id node))
-              (define dequeueed-list (list-remove-last queue))
-              (cond [(eq? id goal-node-id) state]
-                    [else (define connections (graph-get-node-connections graph id))
+  (cond [(queue-empty? queue) 'no-path]
+        [else (define-values (dequeueed-queue node-id) (queue-dequeue queue))
+              (define node (graph-get-node graph node-id))
+              (cond [(eq? node-id goal-node-id) state]
+                    [else (define connections (graph-get-node-connections graph node-id))
                           (define-values
                             (new-queue new-state)
-                            (bfs-explore-connections connections dequeueed-list state id))
+                            (bfs-explore-connections connections dequeueed-queue state node-id))
                           (bfs-call graph new-queue new-state goal-node-id)])]))
 
 (define (bfs-explore-connections connections queue state node-id)    
@@ -36,7 +36,7 @@
                                      (connection-id (car connections))))
          (bfs-explore-connections (rest connections) queue state node-id)]
         [else (define con-id (connection-id (car connections)))
-              (define new_queue (cons con-id queue))
+              (define new_queue (queue-enqueue queue con-id))
               (define new_state (graph-state-discover-node state con-id node-id))
               (bfs-explore-connections (rest connections) new_queue new_state node-id)]))
 
@@ -65,4 +65,8 @@
               
               (if (eq? found #t)
                   (values new-state found)
-                  (dfs-explore-connections graph new-state (rest connections) node-id goal-node-id))]))
+                  (dfs-explore-connections graph
+                                           new-state
+                                           (rest connections)
+                                           node-id
+                                           goal-node-id))]))

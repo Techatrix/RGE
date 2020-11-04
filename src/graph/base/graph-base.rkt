@@ -11,12 +11,14 @@
 (define (graph-make) (graph (list)))
 
 ; Graph add/delete
-
 (define (graph-add-node _graph
-                        #:id [id (graph-get-valid-id _graph)]
-                        #:position [position (vec2 0 0)]
-                        #:connections [connections '()])
-  (graph (append (graph-nodes _graph) (list (node id position connections)))))
+                        #:id [id #f]
+                        #:position [position #f]
+                        #:connections [connections #f])
+  (define new-id (if (not id) (graph-get-valid-id _graph) id))
+  (define new-position (if (not position) (vec2 0 0) position))
+  (define new-connections (if (not connections) '() connections))
+  (graph (cons (node new-id new-position new-connections) (graph-nodes _graph))))
 
 (define (graph-delete-node _graph id)
   (graph (nodes-delete-node (graph-nodes _graph) id)))
@@ -73,7 +75,7 @@
 (define (graph-search-node-by-connections _graph list-cons) (error "No Implementation"))
 
 ; Graph search comparison
-;(define (graph-search-node-by-comparison-id graph choose-first?) (error "No Implementation"))
-;(define (graph-search-node-by-comparison-position graph choose-first?) (error "No Implementation"))
-(define (graph-search-node-by-closest-position _graph pos)
-  (nodes-search-node-by-closest-position (graph-nodes _graph) pos))
+(define (graph-search-node-by-comparison _graph proc)
+  (define nodes (graph-nodes _graph))
+  (cond [(empty? nodes) #f]
+        [else (foldr proc (car nodes) nodes)]))

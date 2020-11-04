@@ -23,17 +23,6 @@
         [(eq? (node-id (car nodes)) id) (cons (proc (car nodes)) (rest nodes))]
         [else (cons (car nodes) (nodes-apply-node (rest nodes) id proc))]))
 
-; nodes search closest
-(define (nodes-search-node-by-closest-position nodes pos)
-  (cond [(empty? nodes) (void)]
-        [else (define node1 (car nodes))
-              (define node2 (nodes-search-node-by-closest-position (rest nodes) pos))
-              (cond [(void? node2) node1]
-                    [else (define dist1 (vec2-dist pos (node-position node1)))
-                          (define dist2 (vec2-dist pos (node-position node2)))
-                          (cond [(< dist1 dist2) node1]
-                                [else node2])])]))
-
 ; graph get valid id
 (define (graph-get-valid-id graph)
   (define nodes (graph-nodes graph))
