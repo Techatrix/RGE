@@ -26,7 +26,7 @@
    (lambda (node con)
      (define origin (node-position node))
      (define target (graph-get-node-position _graph (connection-id con)))
-     (round (/ (vec2-dist origin target) 10)))))
+     (/ (round (/ (vec2-dist origin target) 5)) 10))))
 
 (define (graph-nodes-get-center _graph)
   (nodes-get-center (graph-nodes _graph)))

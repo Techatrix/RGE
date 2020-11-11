@@ -11,7 +11,7 @@
   (list-search (node-connections _node) (lambda (con) (eq? (connection-id con) id))))
 
 (define (node-has-connection? _node id)
-  (not (eq? (node-get-connection _node id) #f)))
+  (not (not (node-get-connection _node id))))
 
 ; Node set
 (define (node-set-id _node new-id)
@@ -23,6 +23,10 @@
 
 ; Node add/delete
 (define (node-add-connection _node new-con)
-  (node-set-connections _node (append (node-connections _node) (list new-con))))
+  (if (not (node-has-connection? _node (connection-id new-con)))
+        (node-set-connections _node (append (node-connections _node) (list new-con)))
+        _node))
 (define (node-delete-connection _node id)
-  (node-set-connections _node (connections-delete-connection (node-connections _node) id)))
+  (if (node-has-connection? _node id)
+        (node-set-connections _node (connections-delete-connection (node-connections _node) id))
+        _node))

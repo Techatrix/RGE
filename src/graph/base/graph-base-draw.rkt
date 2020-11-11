@@ -65,10 +65,10 @@
 (define (get-weight-position pos1 pos2 m)
   (define pos3 (vec2-sub pos2 pos1))
   (define a (/ (vec2-length pos3) 2))
-  (unless (zero? a)
-    (define alpha (atan (/ m a)))
-    (define beta (+ (atan (- (vec2-y pos3)) (vec2-x pos3)) (/ pi 2)))
-    (define gamma (+ alpha beta))
-    (define l (sqrt (+ (* a a) (* m m))))
-    (vec2-add (vec2-scalar (vec2 (sin gamma) (cos gamma)) l) pos1))
-  pos1)
+  (cond [(zero? a) pos1]
+        [else 
+         (define alpha (atan (/ m a)))
+         (define beta (+ (atan (- (vec2-y pos3)) (vec2-x pos3)) (/ pi 2)))
+         (define gamma (+ alpha beta))
+         (define l (sqrt (+ (* a a) (* m m))))
+         (vec2-add (vec2-scalar (vec2 (sin gamma) (cos gamma)) l) pos1)]))

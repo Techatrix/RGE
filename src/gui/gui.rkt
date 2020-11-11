@@ -108,19 +108,33 @@
          [label "Cut"]
          [shortcut #\X]
          [callback
-          (lambda (item event) (send graph-canvas on-cut))])
+          (lambda (item event) (send graph-canvas action-cut))])
     (new menu-item%
          [parent menu-2]
          [label "Copy"]
          [shortcut #\C]
          [callback
-          (lambda (item event) (send graph-canvas on-copy))])
+          (lambda (item event) (send graph-canvas action-copy))])
     (new menu-item%
          [parent menu-2]
          [label "Paste"]
          [shortcut #\V]
          [callback
-          (lambda (item event) (send graph-canvas on-paste))])
+          (lambda (item event) (send graph-canvas action-paste))])
+    (new separator-menu-item% [parent menu-2])
+    (new menu-item%
+         [parent menu-2]
+         [label "Add Node"]
+         [shortcut #\B]
+         [callback
+          (lambda (item event) (send graph-canvas action-add-node))])
+    (new menu-item%
+         [parent menu-2]
+         [label "Delete Node"]
+         ; [shortcut #\B]
+         [callback
+          (lambda (item event) (send graph-canvas action-delete-node))])
+    
     (new separator-menu-item% [parent menu-2])
     (new menu-item%
          [parent menu-2]
@@ -129,7 +143,7 @@
          [callback
           (lambda (item event)
             (define nodes (graph-nodes (send graph-canvas get-graph)))
-            (send graph-canvas set-selections (map node-id nodes)))])
+            (send graph-canvas set-selections! (map node-id nodes)))])
     (new menu-item%
          [parent menu-2]
          [label "Clear All"]
@@ -137,7 +151,7 @@
           (lambda (item event)
             (define result (message-box "Confirm" "Are you sure?" this (list 'ok-cancel)))
             (cond [(eq? result 'ok)
-                   (send graph-canvas reset-graph)]))])
+                   (send graph-canvas action-reset)]))])
     
     ; View Menu
     (define menu-3
@@ -197,14 +211,14 @@
          [checked #t]
          [callback
           (lambda (item event)
-            (send graph-canvas set-draw-axis (send item is-checked?)))])
+            (send graph-canvas set-draw-axis! (send item is-checked?)))])
     (new checkable-menu-item%
          [parent menu-3]
          [label "Draw Grid"]
          [checked #t]
          [callback
           (lambda (item event)
-            (send graph-canvas set-draw-grid (send item is-checked?)))])
+            (send graph-canvas set-draw-grid! (send item is-checked?)))])
     (new separator-menu-item% [parent menu-3])
     (new checkable-menu-item%
          [parent menu-3]
@@ -212,14 +226,14 @@
          [checked #f]
          [callback
           (lambda (item event)
-            (send graph-canvas set-draw-node-ids (send item is-checked?)))])
+            (send graph-canvas set-draw-node-ids! (send item is-checked?)))])
     (new checkable-menu-item%
          [parent menu-3]
          [label "Draw Node Weight"]
          [checked #t]
          [callback
           (lambda (item event)
-            (send graph-canvas set-draw-node-weights (send item is-checked?)))])
+            (send graph-canvas set-draw-node-weights! (send item is-checked?)))])
     
     ; Tools Menu
     (define menu-4
@@ -283,8 +297,44 @@
               (send menu-4-0-2 check #f)
               (set! graph-model-level 3)
               (writeln "FFI"))]))
+    
+    (define menu-4-1
+      (new menu%
+           [label "Algorithm"]
+           [parent menu-4]))
+    (define menu-4-1-0
+      (new checkable-menu-item%
+           [parent menu-4-1]
+           [label "BFS"]
+           [checked #t]
+           [callback
+            (lambda (item event)
+              (send item check #t)
+              (send menu-4-1-1 check #f)
+              (set! graph-algorithm-id 1)
+              (displayln "BFS"))]))
+    (define menu-4-1-1
+      (new checkable-menu-item%
+           [parent menu-4-1]
+           [label "DFS"]
+           [checked #f]
+           [callback
+            (lambda (item event)
+              (send item check #t)
+              (send menu-4-1-0 check #f)
+              (set! graph-algorithm-id 2)
+              (displayln "DFS"))]))
     (new separator-menu-item% [parent menu-4])
 
+    (new menu-item%
+         [parent menu-4]
+         [label "Run Algorithm"]
+         [callback
+          (lambda (item event)
+            (run-algorithm))])
+    
+    (new separator-menu-item% [parent menu-4])
+    
     (new menu-item%
          [parent menu-4]
          [label "Calculate Weights"]
@@ -292,7 +342,7 @@
           (lambda (item event)
             (define old-graph (send graph-canvas get-graph))
             (define new-graph (graph-calculate-weights old-graph))
-            (send graph-canvas set-graph new-graph))])
+            (send graph-canvas set-graph! new-graph))])
 
     (new menu-item%
          [parent menu-4]
@@ -302,7 +352,7 @@
             (define old-graph (send graph-canvas get-graph))
             (define new-graph (graph-set-weights old-graph
                                                  (lambda (node con) 1.0)))
-            (send graph-canvas set-graph new-graph))])
+            (send graph-canvas set-graph! new-graph))])
     (new menu-item%
          [parent menu-4]
          [label "Randomize Weights"]
@@ -312,7 +362,7 @@
             (define new-graph (graph-set-weights old-graph
                                                  (lambda (node con)
                                                    (round (/ (* 100 (random)) 10)))))
-            (send graph-canvas set-graph new-graph))])
+            (send graph-canvas set-graph! new-graph))])
     
     ; Tabs Menu
     (define menu-5
@@ -396,113 +446,36 @@
     
     (_update-choices tab-panel choices-raw 0)
 
-    (define view-panel
-      (new horizontal-panel%
-           [parent tab-panel]))
-
-    (define tool-bar-size 20)
-    (define tool-bar-panel
-      (new vertical-panel%
-           [parent view-panel]
-           [alignment (list 'left 'top)]
-           [min-width tool-bar-size]
-           [stretchable-width #f]))
-
-    (define tool-id 'none)
-    #|
-    (define my-bitmap-1 (read-bitmap "/home/techatrix/Desktop/img-50.png"))
-    (define my-bitmap-2 (read-bitmap "/home/techatrix/Desktop/img-50.png"))
-    (define my-bitmap-3 (read-bitmap "/home/techatrix/Desktop/img-50.png"))
-    |#
-    (define tool-label-1 "add Node")
-    (define tool-label-2 "delete Node")
-    (define tool-label-3 "add Connection")
-    (define tool-label-4 "delete Connection")
-    (define tool-label-5 "move Node")
-    
-    ; TODO: replace button% by control% when using bitmaps
-    (new button%
-         [parent tool-bar-panel]
-         [label "Select"]
-         [callback (lambda (button event)
-                     (send graph-canvas set-tool 'select))])
-    
-    (new button%
-         [parent tool-bar-panel]
-         [label tool-label-1]
-         [min-width tool-bar-size]
-         [min-height tool-bar-size]
-         [stretchable-width #f]
-         [stretchable-height #f]
-         [callback (lambda (button event)
-                     (send graph-canvas set-tool 'add-node))])
-    (new button%
-         [parent tool-bar-panel]
-         [label tool-label-2]
-         [min-width tool-bar-size]
-         [min-height tool-bar-size]
-         [stretchable-width #f]
-         [stretchable-height #f]
-         [callback (lambda (button event)
-                     (send graph-canvas set-tool 'delete-node))])
-    (new button%
-         [parent tool-bar-panel]
-         [label tool-label-3]
-         [min-width tool-bar-size]
-         [min-height tool-bar-size]
-         [stretchable-width #f]
-         [stretchable-height #f]
-         [callback (lambda (button event)
-                     (send graph-canvas set-tool 'add-connection))])
-    (new button%
-         [parent tool-bar-panel]
-         [label tool-label-4]
-         [min-width tool-bar-size]
-         [min-height tool-bar-size]
-         [stretchable-width #f]
-         [stretchable-height #f]
-         [callback (lambda (button event)
-                     (send graph-canvas set-tool 'delete-connection))])
-
     (define graph-model-level 0)
-
-    (define tool-algorithm-choice
-      (new choice%	 
-           [label "Algorithm"]	 
-           [choices (list "None" "BFS" "DFS")]	 
-           [parent tool-bar-panel]))
-
-    (new button%
-         [parent tool-bar-panel]
-         [label "Run Algorithm"]
-         [callback (lambda (button event)
-                     (define id (send tool-algorithm-choice get-selection))
-                     (define message
-                       (cond [(not (zero? id))
-                              (define solver
-                                (case id
-                                  [(0) void]
-                                  [(1) graph-solver-bfs]
-                                  [(2) graph-solver-dfs]))
-                     
-                              (define graph (send graph-canvas get-graph))
-                              (define root-node-id (send graph-canvas get-root-node-id))
-                              (define goal-node-id (send graph-canvas get-goal-node-id))
-
-                              (cond [(and (integer? root-node-id) (integer? goal-node-id))
-                                     (define timer (timer-start))
-                                     (define output (solver graph
-                                                            graph-model-level
-                                                            root-node-id
-                                                            goal-node-id))
-                                     (define time (timer-stop timer))
-                                     (format "Output:\t ~a\nTime:\t~ams" output time)]
+    (define graph-algorithm-id 1)
+    
+    (define (run-algorithm)
+      (define message
+        (cond [(not (zero? graph-algorithm-id))
+               (define solver
+                 (case graph-algorithm-id
+                   [(0) void]
+                   [(1) graph-solver-bfs]
+                   [(2) graph-solver-dfs]))
+               
+               (define graph (send graph-canvas get-graph))
+               (define root-node-id (send graph-canvas get-root-node-id))
+               (define goal-node-id (send graph-canvas get-goal-node-id))
+               
+               (cond [(and (integer? root-node-id) (integer? goal-node-id))
+                      (define timer (timer-start))
+                      (define output (solver graph
+                                             graph-model-level
+                                             root-node-id
+                                             goal-node-id))
+                      (define time (timer-stop timer))
+                      (format "Output:\t ~a\nTime:\t~ams" output time)]
                                     [else "Root or Goal Node are not set!"])]
-                             [else "No Algorithm selected!"]))
-                     (displayln message))])
+              [else "No Algorithm selected!"]))
+      (displayln message))
 
     ; Graph
-    (define graph-canvas (new graph-canvas% [parent view-panel] [style (list 'no-focus)]))
+    (define graph-canvas (new graph-canvas% [parent tab-panel] [style (list 'no-focus)]))
   
     (send graph-canvas set-canvas-background (make-object color% 25 25 25))
 
