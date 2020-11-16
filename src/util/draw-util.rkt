@@ -1,45 +1,40 @@
 #lang racket
 
 (require "util.rkt")
+(require "structures.rkt")
 
+(provide apply-transform)
 (provide draw-point)
 (provide draw-line)
 (provide draw-arrow)
 
-(define node-size 50)
-(define arrow-length 75)
-(define arrow-angle 0.5)
+(define (apply-transform dc pos)
+  (define t (send dc get-initial-matrix))
 
+  (define delta-pos (vec2 (vector-ref t 4) (vector-ref t 5)))
+  (define scale (vec2 (vector-ref t 0) (vector-ref t 3)))
 
-(define (draw-point dc pos)
-  (send dc draw-ellipse (- (car pos) (/ node-size 2)) (- (cadr pos) (/ node-size 2)) node-size node-size))
+  (define result (vec2-div (vec2-sub pos delta-pos) scale))
+  (vec2 (exact-round (vec2-x result)) (exact-round (vec2-y result))))
 
-(define (draw-line dc pos1 pos2) (send dc draw-line (car pos1) (cadr pos1) (car pos2) (cadr pos2)))
+(define (draw-point dc pos size)
+  (send dc draw-ellipse (- (vec2-x pos) (/ size 2)) (- (vec2-y pos) (/ size 2)) size size))
+
+(define (draw-line dc pos1 pos2)
+  (send dc draw-line (vec2-x pos1) (vec2-y pos1) (vec2-x pos2) (vec2-y pos2)))
 
 (define (draw-arrow dc pos1 pos2)
-  (draw-line dc pos1 pos2)
+  (define AB (vec2-sub pos2 pos1))
+  (define l (vec2-length AB))
+  (when (< 30 l)
+        (define arrow-length (/ 80 (+ 1 (exp (+ (* (/ -1 100) l) 2)))))
+        (define arrow-angle (/ pi 6))
 
-  (define delta (sub-point pos2 pos1))
-  (cond [(eq? (car delta) 0)
-              (define alpha (- arrow-angle (/ pi 2)))
+        (define origin (vec2-add pos1 (vec2-scalar (vec2-norm AB) 30)))
+        (define target (vec2-add pos1 (vec2-scalar (vec2-norm AB) (- l 30))))
+        (define dir1 (vec2-scalar (vec2-norm (vec2-rotate AB (- pi arrow-angle))) arrow-length))
+        (define dir2 (vec2-scalar (vec2-norm (vec2-rotate AB (+ pi arrow-angle))) arrow-length))
 
-              (define dx (* arrow-length (sin alpha)))
-              (define dy (* arrow-length (cos alpha)))
-
-              (draw-line dc pos2 (add-point pos2 (list dx dy)))
-              ]
-        [else (define beta (atan (/ (- 0 (cadr delta)) (car delta))))
-              (define alpha1 (- (+ arrow-angle beta) (/ pi 2)))
-
-              (define dx1 (* arrow-length (sin alpha1)))
-              (define dy1 (* arrow-length (cos alpha1)))
-
-              (draw-line dc pos2 (add-point pos2 (list dx1 dy1)))
-
-              (define alpha2 (- beta arrow-angle (/ pi 2)))
-
-              (define dx2 (* arrow-length (sin alpha2)))
-              (define dy2 (* arrow-length (cos alpha2)))
-
-              (draw-line dc pos2 (add-point pos2 (list dx2 dy2)))
-        ]))
+        (draw-line dc origin target)
+        (draw-line dc target (vec2-add target dir1))
+        (draw-line dc target (vec2-add target dir2))))
