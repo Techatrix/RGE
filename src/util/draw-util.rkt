@@ -14,7 +14,8 @@
   (define delta-pos (vec2 (vector-ref t 4) (vector-ref t 5)))
   (define scale (vec2 (vector-ref t 0) (vector-ref t 3)))
 
-  (vec2-div (vec2-sub pos delta-pos) scale))
+  (define result (vec2-div (vec2-sub pos delta-pos) scale))
+  (vec2 (exact-round (vec2-x result)) (exact-round (vec2-y result))))
 
 (define (draw-point dc pos size)
   (send dc draw-ellipse (- (vec2-x pos) (/ size 2)) (- (vec2-y pos) (/ size 2)) size size))

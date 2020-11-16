@@ -14,7 +14,9 @@
   (send canvas-dc set-brush color-white 'solid)
   (send canvas-dc set-pen color-white 1 'solid)
   (draw-nodes-connections graph (graph-nodes graph) canvas-dc draw-weights?)
-  (draw-nodes-point (graph-nodes graph) canvas-dc selections draw-ids?))
+  (draw-nodes-point (graph-nodes graph) canvas-dc selections draw-ids?)
+  (send canvas-dc set-brush color-white 'solid)
+  (send canvas-dc set-pen color-white 1 'solid))
 
 ; draw nodes point
 (define (draw-nodes-point nodes canvas-dc selections draw-ids?)
