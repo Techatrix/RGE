@@ -24,9 +24,9 @@
 ; Node add/delete
 (define (node-add-connection _node new-con)
   (if (not (node-has-connection? _node (connection-id new-con)))
-        (node-set-connections _node (append (node-connections _node) (list new-con)))
-        _node))
+      (node-set-connections _node (append (node-connections _node) (list new-con)))
+      _node))
 (define (node-delete-connection _node id)
   (if (node-has-connection? _node id)
-        (node-set-connections _node (connections-delete-connection (node-connections _node) id))
-        _node))
+      (node-set-connections _node (connections-delete-connection (node-connections _node) id))
+      _node))

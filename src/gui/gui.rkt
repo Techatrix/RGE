@@ -127,13 +127,14 @@
          [label "Add Node"]
          [shortcut #\B]
          [callback
-          (lambda (item event) (send graph-canvas action-add-node))])
+          (lambda (item event) (send graph-canvas set-tool! 'add-node))])
     (new menu-item%
          [parent menu-2]
          [label "Delete Node"]
-         ; [shortcut #\B]
+         [shortcut #\B]
+         [shortcut-prefix (list 'shift 'ctl)]
          [callback
-          (lambda (item event) (send graph-canvas action-delete-node))])
+          (lambda (item event) (send graph-canvas set-tool! 'delete-node))])
     
     (new separator-menu-item% [parent menu-2])
     (new menu-item%
@@ -147,6 +148,8 @@
     (new menu-item%
          [parent menu-2]
          [label "Clear All"]
+         [shortcut #\A]
+         [shortcut-prefix (list 'shift 'ctl)]
          [callback
           (lambda (item event)
             (define result (message-box "Confirm" "Are you sure?" this (list 'ok-cancel)))
@@ -329,6 +332,8 @@
     (new menu-item%
          [parent menu-4]
          [label "Run Algorithm"]
+         [shortcut 'f9]
+         [shortcut-prefix '()]
          [callback
           (lambda (item event)
             (run-algorithm))])
@@ -470,7 +475,7 @@
                                              goal-node-id))
                       (define time (timer-stop timer))
                       (format "Output:\t ~a\nTime:\t~ams" output time)]
-                                    [else "Root or Goal Node are not set!"])]
+                     [else "Root or Goal Node are not set!"])]
               [else "No Algorithm selected!"]))
       (displayln message))
 
