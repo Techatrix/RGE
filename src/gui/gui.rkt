@@ -447,7 +447,7 @@
     (define (panel-remove-tab id)
       (panel-set-selection (- id 1))
       (send tab-panel delete id)
-      (set! tabs (list-delete-n tabs id))
+      (set! tabs (list-remove-n tabs id))
       (panel-update tabs 0))
 
     (define (panel-set-tab tabs id tab i)

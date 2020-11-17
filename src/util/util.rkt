@@ -19,13 +19,6 @@
          (+ min-n (modulo a b))]
         [else number]))
 
-
-; list delete n
-(define (list-delete-n l n)
-  (cond [(empty? l) '()]
-        [(eq? n 0) (rest l)]
-        [else (append (list (car l)) (list-delete-n (rest l) (- n 1)))]))
-
 ; list apply
 (define (list-apply lst proc)
   (if (empty? lst)
@@ -52,7 +45,7 @@
 
 (define (list-remove lst proc)
   (cond [(empty? lst) '()]
-        [(proc (car lst)) (rest lst)]
+        [(proc (car lst)) (list-remove (rest lst) proc)]
         [else (cons (car lst) (list-remove (rest lst) proc))]))
 
 ; list removes element at position n
@@ -63,7 +56,7 @@
 
 ; list remove last element
 (define (list-remove-last lst)
-  (cond [(null? (cdr lst)) '()]
+  (cond [(or (empty? lst) (empty? (rest lst))) '()]
         [else (cons (car lst) (list-remove-last (cdr lst)))]))
 
 (define (list-for-recur v lst proc)
