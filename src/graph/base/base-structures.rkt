@@ -3,6 +3,7 @@
 (require "../../util/structures.rkt")
 
 (provide (all-defined-out))
+(provide (all-from-out "../../util/structures.rkt"))
 
 (struct connection (id weight) #:transparent)
 
@@ -10,4 +11,4 @@
 
 (struct node (id position connections) #:transparent)
 
-(struct graph (nodes) #:transparent)
+(struct graph (nodes [root-node-id #:mutable] [goal-node-id #:mutable]) #:transparent)

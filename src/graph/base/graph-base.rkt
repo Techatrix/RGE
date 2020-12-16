@@ -8,7 +8,7 @@
 (provide (all-defined-out))
 
 ; Graph make
-(define (graph-make) (graph (list)))
+(define (graph-make) (graph (list) #f #f))
 
 ; Graph add/delete
 (define (graph-add-node _graph
@@ -18,10 +18,10 @@
   (define new-id (if (not id) (graph-get-valid-id _graph) id))
   (define new-position (if (not position) (vec2 0 0) position))
   (define new-connections (if (not connections) '() connections))
-  (graph (cons (node new-id new-position new-connections) (graph-nodes _graph))))
+  (graph-set-nodes _graph (cons (node new-id new-position new-connections) (graph-nodes _graph))))
 
 (define (graph-delete-node _graph id)
-  (graph (nodes-delete-node (graph-nodes _graph) id)))
+  (graph-set-nodes _graph  (nodes-delete-node (graph-nodes _graph) id)))
 
 ; Graph get
 (define (graph-get-node _graph id) (graph-search-node-by-id _graph id))
@@ -34,35 +34,42 @@
   (node-has-connection? node id2))
 
 ; Graph set
+(define (graph-set-nodes _graph nodes)
+  (graph nodes (graph-root-node-id _graph) (graph-goal-node-id _graph)))
+
 (define (graph-set-node _graph id node)
-  (graph (nodes-apply-node (graph-nodes _graph) id
-                           (lambda (node) node))))
+  (graph-set-nodes _graph (nodes-apply-node (graph-nodes _graph) id
+                                            (lambda (node) node))))
 
 (define (graph-set-node-id _graph id new-id)
-  (graph (nodes-apply-node (graph-nodes _graph) id
-                           (lambda (node) (node-set-id node id)))))
+  (graph-set-nodes _graph (nodes-apply-node (graph-nodes _graph) id
+                                            (lambda (node) (node-set-id node id)))))
 
 (define (graph-set-node-position _graph id new-pos)
-  (graph (nodes-apply-node (graph-nodes _graph) id
-                           (lambda (node) (node-set-position node new-pos)))))
+  (graph-set-nodes _graph (nodes-apply-node (graph-nodes _graph) id
+                                            (lambda (node) (node-set-position node new-pos)))))
 
 (define (graph-set-node-connections _graph id new-list-cons)
-  (graph (nodes-apply-node (graph-nodes _graph) id
-                           (lambda (node) (node-set-connections node new-list-cons)))))
+  (graph-set-nodes _graph (nodes-apply-node (graph-nodes _graph) id
+                                            (lambda (node)
+                                              (node-set-connections node new-list-cons)))))
 
 (define (graph-set-node-add-connection _graph id1 id2)
-  (graph (nodes-apply-node (graph-nodes _graph) id1
-                           (lambda (node) (node-add-connection node (connection id2 1.0))))))
+  (graph-set-nodes _graph (nodes-apply-node (graph-nodes _graph) id1
+                                            (lambda (node)
+                                              (node-add-connection node (connection id2 1.0))))))
 
 (define (graph-set-node-delete-connection _graph id1 id2)
-  (graph (nodes-apply-node (graph-nodes _graph) id1
-                           (lambda (node) (node-delete-connection node id2)))))
+  (graph-set-nodes _graph (nodes-apply-node (graph-nodes _graph) id1
+                                            (lambda (node) (node-delete-connection node id2)))))
 
 (define (graph-set-nodes-add-connection _graph id)
-  (graph (list-apply (graph-nodes _graph) (lambda (node) (node-add-connection node id)))))
+  (graph-set-nodes _graph (list-apply (graph-nodes _graph)
+                                      (lambda (node) (node-add-connection node id)))))
 
 (define (graph-set-nodes-delete-connection _graph id)
-  (graph (list-apply (graph-nodes _graph) (lambda (node) (node-delete-connection node id)))))
+  (graph-set-nodes _graph (list-apply (graph-nodes _graph)
+                                      (lambda (node) (node-delete-connection node id)))))
 
   
 ; Graph search

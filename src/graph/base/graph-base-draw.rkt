@@ -3,8 +3,8 @@
 (require "graph-base.rkt")
 (require "node-base.rkt")
 (require "base-structures.rkt")
-(require "../../util/color.rkt")
 (require "../../util/util.rkt")
+(require "../../util/color.rkt")
 (require "../../util/draw-util.rkt")
 
 (provide draw-graph)

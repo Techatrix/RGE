@@ -1,8 +1,7 @@
 #lang racket/gui
 
 (require "view-canvas.rkt")
-(require "../graph/base/base.rkt")
-(require "util.rkt")
+(require "../graph/graph.rkt")
 (require "../util/util.rkt")
 
 (provide graph-base-canvas%
@@ -15,7 +14,7 @@
     (define/public (get-graph) graph)
     
     (define/public (set-graph! new-graph)
-      (set! graph (if (void? new-graph) (graph-make) new-graph))
+      (set! graph (if (graph? new-graph) new-graph (graph-make)))
       (send this refresh))
     ; single
     (define/public (base-add-node-proc proc position)
@@ -161,7 +160,7 @@
   (datum->syntax
    stx
    '(inherit get-graph
-             set-graph!
+             ; set-graph!
              base-add-node-proc
              base-delete-node-proc
              base-copy-node-proc

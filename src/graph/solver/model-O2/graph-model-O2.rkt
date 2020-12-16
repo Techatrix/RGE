@@ -6,4 +6,6 @@
 (require/typed "../../base/base-structures.rkt"
                [#:struct connection ([id : Nonnegative-Integer] [weight : Real])]
                [#:struct node ([id : Nonnegative-Integer] [position : vec2] [connections : connection])]
-               [#:struct graph ([nodes : (Listof node)])])
+               [#:struct graph ([nodes : (Listof node)]
+                                [root-node-id : Nonnegative-Integer]
+                                [goal-node-id : Nonnegative-Integer])])

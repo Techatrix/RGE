@@ -59,6 +59,17 @@
   (cond [(or (empty? lst) (empty? (rest lst))) '()]
         [else (cons (car lst) (list-remove-last (cdr lst)))]))
 
+(define (list-replace lst proc v)
+  (cond [(empty? lst) '()]
+        [else (cons (if (proc (car lst))
+                        v
+                        (car lst)) (list-replace (rest lst) proc v))]))
+
+(define (list-replace-n lst n v)
+  (cond [(empty? lst) '()]
+        [(zero? n) (cons v (rest lst))]
+        [else (cons (car lst) (list-replace-n (rest lst) (- n 1) v))]))
+
 (define (list-for-recur v lst proc)
   (cond [(empty? lst) v]
         [else (list-for-recur (proc v (car lst)) (rest lst) proc)]))
