@@ -1,7 +1,7 @@
 #lang racket
 
-(require "../graph/graph.rkt")
-(require "../util/util.rkt")
+(require "../base/base.rkt")
+(require "../../util/util.rkt")
 
 (provide graph-set-weights
          graph-calculate-weights
@@ -12,13 +12,15 @@
          nodes-get-selection)
 
 (define (graph-set-weights _graph proc)
-  (graph (map (lambda (node)
-                (node-set-connections
-                 node
-                 (map (lambda (con)
-                        (connection (connection-id con) (proc node con)))
-                      (node-connections node))))
-              (graph-nodes _graph))))
+  (graph-set-nodes
+   _graph
+   (map (lambda (node)
+          (node-set-connections
+           node
+           (map (lambda (con)
+                  (connection (connection-id con) (proc node con)))
+                (node-connections node))))
+        (graph-nodes _graph))))
 
 (define (graph-calculate-weights _graph)
   (graph-set-weights

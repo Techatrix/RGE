@@ -1,21 +1,17 @@
 #lang racket/gui
 
 (require "graph-base-canvas.rkt")
-(require "../graph/base/base.rkt")
+(require "../graph/graph.rkt")
 (require "../util/util.rkt")
 (require "../util/draw-util.rkt")
 (require "../util/color.rkt")
-(require "util.rkt")
-
-(require "../graph/solver/graph-solver.rkt")
 
 (provide graph-canvas%)
 
 (define graph-canvas%
   (class graph-base-canvas%
-    (init-field [tool-id 'select]
-                [root-node-id #f]
-                [goal-node-id #f]
+    (init-field [action-callback void]
+                [tool-id 'select]
                 [draw-axis? #f]
                 [draw-grid? #t]
                 [draw-node-ids #f]
@@ -33,11 +29,11 @@
     (define selecting? #f)
     (define copy-nodes '())
 
-    ; getter
-    (define/public (get-root-node-id) root-node-id)
-    (define/public (get-goal-node-id) goal-node-id)
-
     ; setter
+    (define/overment (set-graph! new-graph)
+      (super set-graph! new-graph)
+      (action-callback graph))
+    
     (define/public (set-tool! tool)
       (set! tool-id tool)
       (set! selections '())
@@ -50,10 +46,10 @@
       (send this refresh))
 
     (define/public (set-root-node-id! new-root-node-id)
-      (set! root-node-id new-root-node-id)
+      (set-graph-root-node-id! graph new-root-node-id)
       (send this refresh))
     (define/public (set-goal-node-id! new-goal-node-id)
-      (set! goal-node-id new-goal-node-id)
+      (set-graph-goal-node-id! graph new-goal-node-id)
       (send this refresh))
 
     (define/public (set-draw-axis! _draw-axis)
@@ -258,8 +254,6 @@
       (set! selections '())
       (set! selecting? #f)
       (set! selection-box (list (vec2 0 0) (vec2 0 0)))
-      (set! root-node-id (void))
-      (set! goal-node-id (void))
       (set-graph! (graph-make)))
 
     ; event handling
@@ -353,6 +347,9 @@
         
         (when draw-grid? (draw-grid dc))
         (when draw-axis? (draw-axis dc))
+
+        (define root-node-id (graph-root-node-id graph))
+        (define goal-node-id (graph-goal-node-id graph))
         
         (when (integer? root-node-id)
           (if (not (graph-get-node graph root-node-id))
@@ -368,7 +365,8 @@
         (when (and (eq? tool-id 'add-node) active)
           (draw-point dc mouse-pos-view 50))
 
-        (when selecting? (draw-selection-box dc)))])
+        (when selecting? (draw-selection-box dc))
+        )])
     
     (send (send this get-dc) set-smoothing 'smoothed)
     ))
