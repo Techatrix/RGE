@@ -17,9 +17,8 @@
   (define state
     (graph-state-disco-node-discover (graph-state-disco-build graph) root-node-id root-node-id))
 
-
   (define-values (new-state found)
-    (bfs-call graph (queue (list root-node-id)) new-state goal-node-id))
+    (bfs-call graph (queue (list root-node-id)) state goal-node-id))
   
   (if (eq? found #t)
       (graph-state-disco->route new-state root-node-id goal-node-id)

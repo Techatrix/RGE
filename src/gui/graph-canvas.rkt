@@ -12,14 +12,15 @@
   (class graph-base-canvas%
     (init-field [action-callback void]
                 [tool-id 'select]
+                [dark-mode? #f]
                 [draw-axis? #f]
                 [draw-grid? #t]
-                [draw-node-ids #f]
-                [draw-node-weights #t])
+                [draw-node-ids? #f]
+                [draw-node-weights? #t])
     
     (inherit-field graph)
     (inherit-from-graph-base-canvas)
-
+    
     (define mouse-pos (vec2 0 0))
     (define p-mouse-pos (vec2 0 0))
     
@@ -52,20 +53,28 @@
       (set-graph-goal-node-id! graph new-goal-node-id)
       (send this refresh))
 
-    (define/public (set-draw-axis! _draw-axis)
+    (define/public (set-draw-axis?! _draw-axis)
       (set! draw-axis? _draw-axis)
       (send this refresh))
 
-    (define/public (set-draw-grid! _draw-grid)
+    (define/public (set-draw-grid?! _draw-grid)
       (set! draw-grid? _draw-grid)
       (send this refresh))
 
-    (define/public (set-draw-node-ids! draw-node-ids?)
-      (set! draw-node-ids draw-node-ids?)
+    (define/public (set-dark-mode?! _dark-mode?)
+      (set! dark-mode? _dark-mode?)
+      (send this set-canvas-background
+              (if _dark-mode?
+                  (make-object color% 25 25 25)
+                  (make-object color% 225 225 225)))
+      (send this refresh))
+    
+    (define/public (set-draw-node-ids?! _draw-node-ids?)
+      (set! draw-node-ids? _draw-node-ids?)
       (send this refresh))
 
-    (define/public (set-draw-node-weights! draw-node-weights?)
-      (set! draw-node-weights draw-node-weights?)
+    (define/public (set-draw-node-weights?! _draw-node-weights?)
+      (set! draw-node-weights? _draw-node-weights?)
       (send this refresh))
     
     ; Mouse position
@@ -82,12 +91,16 @@
         (draw-point dc p1 55)))
     (define/private (draw-selection-box dc)
       (define-values (start-x end-x start-y end-y) (rect-get-points selection-box))
-      
-      (send dc set-brush (make-object color% 255 255 255 0.25) 'opaque)
-      (send dc set-pen color-white 1 'solid)
+
+      (define c1 (if dark-mode? color-white color-black))
+      (define c2 (if dark-mode?
+                     (make-object color% 255 255 255 0.25)
+                     (make-object color% 0 0 0 0.25)))
+      (send dc set-brush c2 'opaque)
+      (send dc set-pen c1 1 'solid)
       (send dc draw-rectangle start-x start-y (- end-x start-x) (- end-y start-y)))
     (define/private (draw-axis dc)
-      (send dc set-pen color-white 2 'solid)
+      (send dc set-pen (if dark-mode? color-white color-black) 2 'solid)
       (send dc draw-line 0 0 0 16383)
       (send dc draw-line 0 0 16383 0))
 
@@ -106,7 +119,10 @@
       (define y-start (- y (remainder (exact-floor y) step-size)))
       (define num (+ (abs (exact-ceiling (/ (max w h) step-size))) 1))
 
-      (send dc set-pen (make-object color% 51 51 51) 1 'solid)
+      (send dc set-pen
+            (if dark-mode?
+                (make-object color% 51 51 51)
+                (make-object color% 0 0 0))1 'solid)
       (for ([a (build-list num (lambda (x) (* x step-size)))])
         (define min -16383)
         (define max 16383)
@@ -360,13 +376,13 @@
               (set-goal-node-id! #f)
               (draw-node-highlight dc color-blue goal-node-id)))
 
-        (draw-graph graph dc selections draw-node-ids draw-node-weights)
+        (draw-graph graph dc selections dark-mode? draw-node-ids? draw-node-weights?)
 
         (when (and (eq? tool-id 'add-node) active)
           (draw-point dc mouse-pos-view 50))
 
-        (when selecting? (draw-selection-box dc))
-        )])
+        (when selecting? (draw-selection-box dc)))])
     
     (send (send this get-dc) set-smoothing 'smoothed)
-    ))
+    (set-dark-mode?! dark-mode?)))
+

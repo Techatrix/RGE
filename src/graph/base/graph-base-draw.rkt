@@ -10,25 +10,31 @@
 (provide draw-graph)
 
 ; draw graph
-(define (draw-graph graph canvas-dc selections draw-ids? draw-weights?)
-  (send canvas-dc set-brush color-white 'solid)
-  (send canvas-dc set-pen color-white 1 'solid)
-  (draw-nodes-connections graph (graph-nodes graph) canvas-dc draw-weights?)
-  (draw-nodes-point (graph-nodes graph) canvas-dc selections draw-ids?)
-  (send canvas-dc set-brush color-white 'solid)
-  (send canvas-dc set-pen color-white 1 'solid))
+(define (draw-graph graph canvas-dc selections dark-mode? draw-ids? draw-weights?)
+  (define-values (c1 c2 c3)
+    (if dark-mode?
+        (values color-white color-dark-gray color-white)
+        (values color-gray color-dark-gray color-black)))
+  (define nodes (graph-nodes graph))
+  
+  (send canvas-dc set-pen c3 1 'solid)
+  (send canvas-dc set-text-foreground c3)
+  (draw-nodes-connections graph nodes canvas-dc draw-weights?)
+  
+  (send canvas-dc set-brush c1 'solid)
+  (draw-nodes-point nodes canvas-dc c2 selections draw-ids?))
 
 ; draw nodes point
-(define (draw-nodes-point nodes canvas-dc selections draw-ids?)
+(define (draw-nodes-point nodes canvas-dc color selections draw-ids?)
   (cond [(empty? nodes)]
-        [else (draw-node-point (car nodes) canvas-dc selections draw-ids?)
-              (draw-nodes-point (rest nodes) canvas-dc selections draw-ids?)]))
+        [else (draw-node-point (car nodes) canvas-dc color selections draw-ids?)
+              (draw-nodes-point (rest nodes) canvas-dc color selections draw-ids?)]))
 
-(define (draw-node-point node canvas-dc selections draw-ids?)
+(define (draw-node-point node canvas-dc color selections draw-ids?)
   (define pos (node-position node))
   
   (if (not (list-search-eq selections (node-id node)))
-      (send canvas-dc set-pen color-white 1 'solid)
+      (send canvas-dc set-pen color 1 'solid)
       (send canvas-dc set-pen color-red 2 'solid))
 
   (draw-point canvas-dc pos 50)
@@ -59,7 +65,6 @@
     (define text (number->string (connection-weight connection)))
     (define text-pos (get-weight-position origin target 15))
     (define-values (w h a b) (send canvas-dc get-text-extent text))
-    (send canvas-dc set-text-foreground color-white)
     (define centered-text-pos (vec2-sub text-pos (vec2-scalar (vec2 w h) 0.5)))
     (send canvas-dc draw-text text (vec2-x centered-text-pos) (vec2-y centered-text-pos))))
 
