@@ -6,6 +6,7 @@
 (require "../graph/graph.rkt")
 (require "../util/util.rkt")
 (require "../util/timer.rkt")
+(require "../util/preference-manager.rkt")
 
 (provide gui%
          new-gui)
@@ -124,12 +125,17 @@
     (build-menu-items
      menu-3
      (list
-      "Zoom in" "Zoom out" "View auto" "View reset"
+      "Zoom in" "Zoom out" "View auto" "View reset" "Dark Mode"
       "Draw Axis" "Draw Grid" "Draw Node ID" "Draw Node Weight")
-     (list #f #f #t #f #t #f #t #f)
-     (list #f #f #f #f '(#t) '(#t) '(#f) '(#t)) 
-     (list 'add 'subtract #f #f #f #f #f #f)
-     (list #f #f #f #f #f #f #f #f)
+     (list #f #f #t #f #t #t #f #t #f)
+     (list #f #f #f #f
+      (list (get-pref 'dark-mode #f))
+      (list (get-pref 'draw-axis #f))
+      (list (get-pref 'draw-grid #t))
+      (list (get-pref 'draw-node-id #f))
+      (list (get-pref 'draw-node-weight #t))) 
+     (list 'add 'subtract #f #f #f #f #f #f #f)
+     (list #f #f #f #f #f #f #f #f #f)
      (list
       (lambda (a b)
         (define size (vec2 (send graph-canvas get-width)
@@ -157,11 +163,26 @@
       (lambda (a b)
         (send (send graph-canvas get-dc) set-initial-matrix (vector 1 0 0 1 0 0))
         (send graph-canvas refresh))
-      (lambda (item _) (send graph-canvas set-draw-axis! (send item is-checked?)))
-      (lambda (item _) (send graph-canvas set-draw-grid! (send item is-checked?)))
-      (lambda (item _) (send graph-canvas set-draw-node-ids! (send item is-checked?)))
-      (lambda (item _) (send graph-canvas set-draw-node-weights! (send item is-checked?)))
-      ))
+      (lambda (item _)
+        (define checked? (send item is-checked?))
+        (put-pref 'dark-mode checked?)
+        (send graph-canvas set-dark-mode?! checked?))
+      (lambda (item _)
+        (define checked? (send item is-checked?))
+        (put-pref 'draw-axis checked?)
+        (send graph-canvas set-draw-axis?! checked?))
+      (lambda (item _)
+        (define checked? (send item is-checked?))
+        (put-pref 'draw-grid checked?)
+        (send graph-canvas set-draw-grid?! checked?))
+      (lambda (item _)
+        (define checked? (send item is-checked?))
+        (put-pref 'draw-node-id checked?)
+        (send graph-canvas set-draw-node-ids?! checked?))
+      (lambda (item _)
+        (define checked? (send item is-checked?))
+        (put-pref 'draw-node-weight checked?)
+        (send graph-canvas set-draw-node-weights?! checked?))))
     
     ; Tools Menu
     (define menu-4
@@ -175,7 +196,7 @@
            [parent menu-4]))
 
     (define (model-menu-item-callback index)
-      (set! graph-model-level index)
+      (put-pref 'model-id index)
       (define (proc items i)
         (cond [(empty? items)]
               [else
@@ -188,7 +209,11 @@
        menu-4-0
        (list "Racket" "Racket Optimized" "Racket Typed" "FFI")
        (list #f #f #f #f)
-       (list '(#t) '(#f) '(#f) '(#f)) 
+       (list
+        (list (eq? (get-pref 'model-id 0) 0))
+        (list (eq? (get-pref 'model-id 0) 1))
+        (list (eq? (get-pref 'model-id 0) 2))
+        (list (eq? (get-pref 'model-id 0) 3))) 
        (list #f #f #f #f)
        (list #f #f #f #f)
        (list
@@ -203,7 +228,7 @@
            [parent menu-4]))
 
     (define (agol-menu-item-callback index)
-      (set! graph-algorithm-id index)
+      (put-pref 'agol-id index)
       (define (proc items i)
         (cond [(empty? items)]
               [else
@@ -216,7 +241,11 @@
        menu-4-1
        (list "BFS" "DFS" "Dijkstra" "A-Star")
        (list #f #f #f #f)
-       (list '(#t) '(#f) '(#f) '(#f)) 
+       (list
+        (list (eq? (get-pref 'agol-id 0) 0))
+        (list (eq? (get-pref 'agol-id 0) 1))
+        (list (eq? (get-pref 'agol-id 0) 2))
+        (list (eq? (get-pref 'agol-id 0) 3))) 
        (list #f #f #f #f)
        (list #f #f #f #f)
        (list
@@ -329,7 +358,7 @@
       (car (string-split (path->string (file-name-from-path path)) ".")))
 
     (define (ask-graph-save-path label)
-      (put-file label this #f "graph" "json" null '(("JSON (*.json)" "*.json"))))
+      (put-file label this #f "graph" "json" null '(("JSON (*.json)" "*.json") ("Any" "*.*"))))
     
     (define (save-to-path path current-tab)
       (write-json-graph path (send graph-canvas get-graph))
@@ -353,7 +382,7 @@
 
     (define (load-graph-tab)
       (define path
-        (get-file "Open File" this #f #f ".json" null '(("JSON (*.json)" "*.json"))))
+        (get-file "Open File" this #f #f ".json" null '(("JSON (*.json)" "*.json") ("Any" "*.*"))))
       (cond [(path? path)
              (send panel add-tab
                    (path-get-filename path)
@@ -405,20 +434,16 @@
             (lambda (panel event)
               (panel-set-selection (send panel get-selection)))]))
     
-    
-    (define graph-model-level 0)
-    (define graph-algorithm-id 1)
-    
     (define (run-algorithm)
+      (define agol-id (get-pref 'agol-id 0))
       (define message
-        (cond [(not (zero? graph-algorithm-id))
+        (cond [(not (zero? agol-id))
                (define solver
-                 (case graph-algorithm-id
-                   [(0) void]
-                   [(1) graph-solver-bfs]
-                   [(2) graph-solver-dfs]
-                   [(3) graph-solver-dijkstra]
-                   [(4) graph-solver-a-star]))
+                 (case agol-id
+                   [(0) graph-solver-bfs]
+                   [(1) graph-solver-dfs]
+                   [(2) graph-solver-dijkstra]
+                   [(3) graph-solver-a-star]))
                
                (define graph (send graph-canvas get-graph))
                (define root-node-id (graph-root-node-id graph))
@@ -427,7 +452,7 @@
                (cond [(and (integer? root-node-id) (integer? goal-node-id))
                       (define timer (timer-start))
                       (define output (solver graph
-                                             graph-model-level
+                                             (get-pref 'model-id 0)
                                              root-node-id
                                              goal-node-id))
                       (define time (timer-stop timer))
@@ -440,6 +465,11 @@
     (define graph-canvas
       (new graph-canvas%
            [parent panel]
+           [dark-mode? (get-pref 'dark-mode #f)]
+           [draw-axis? (get-pref 'draw-axis #f)]
+           [draw-grid? (get-pref 'draw-grid #t)]
+           [draw-node-ids? (get-pref 'draw-node-id #f)]
+           [draw-node-weights? (get-pref 'draw-node-weight #t)]
            [action-callback
             (lambda (_)
               (define current-tab (send panel get-current-tab))
@@ -448,6 +478,4 @@
                          (tab-path current-tab)
                          #f
                          (tab-data current-tab))))]
-           [style (list 'no-focus )]))
-    
-    (send graph-canvas set-canvas-background (make-object color% 25 25 25))))
+           [style (list 'no-focus )]))))
