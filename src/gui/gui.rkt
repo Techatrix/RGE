@@ -436,29 +436,29 @@
     
     (define (run-algorithm)
       (define agol-id (get-pref 'agol-id 0))
+      
+      (define solver
+        (case agol-id
+          [(0) graph-solver-bfs]
+          [(1) graph-solver-dfs]
+          [(2) graph-solver-dijkstra]
+          [(3) graph-solver-a-star]))
+      
+      (define graph (send graph-canvas get-graph))
+      (define root-node-id (graph-root-node-id graph))
+      (define goal-node-id (graph-goal-node-id graph))
+      
       (define message
-        (cond [(not (zero? agol-id))
-               (define solver
-                 (case agol-id
-                   [(0) graph-solver-bfs]
-                   [(1) graph-solver-dfs]
-                   [(2) graph-solver-dijkstra]
-                   [(3) graph-solver-a-star]))
-               
-               (define graph (send graph-canvas get-graph))
-               (define root-node-id (graph-root-node-id graph))
-               (define goal-node-id (graph-goal-node-id graph))
-               
-               (cond [(and (integer? root-node-id) (integer? goal-node-id))
-                      (define timer (timer-start))
-                      (define output (solver graph
-                                             (get-pref 'model-id 0)
-                                             root-node-id
-                                             goal-node-id))
-                      (define time (timer-stop timer))
-                      (format "Output:\t ~a\nTime:\t~ams" output time)]
-                     [else "Root or Goal Node are not set!"])]
-              [else "No Algorithm selected!"]))
+        (cond [(and (integer? root-node-id) (integer? goal-node-id))
+               (define timer (timer-start))
+               (define output (solver graph
+                                      (get-pref 'model-id 0)
+                                      root-node-id
+                                      goal-node-id))
+               (define time (timer-stop timer))
+               (format "Output:\t ~a\nTime:\t~ams" output time)]
+              [else "Root or Goal Node are not set!"]))
+      
       (displayln message))
 
     ; Graph Canvas

@@ -1,8 +1,7 @@
 #lang racket
 
 (require "../../../util/util.rkt")
-(require "../../base/base.rkt")
-(require "graph-state.rkt")
+(require "../../base/base-structures.rkt")
 (require "graph-state-disco.rkt")
 
 (provide node-state-dijkstra-get-distance
@@ -13,8 +12,8 @@
          node-state-dijkstra-set-previous
          graph-state-dijkstra-node-set-distance
          graph-state-dijkstra-node-set-previous
-         graph-state-dijkstra-build
-         graph-state-dijkstra->route)
+         graph-state-dijkstra->route
+         (all-from-out "graph-state-disco.rkt"))
 
 (define (node-state-dijkstra-get-distance node-state)
   (car (node-state-data node-state)))
@@ -39,16 +38,6 @@
    graph-state
    n
    (node-state-dijkstra-set-previous (graph-state-get-node graph-state n) previous)))
-
-
-(define (graph-state-dijkstra-build graph)
-  (graph-state (_graph-state-dijkstra-build (graph-nodes graph))))
-
-(define (_graph-state-dijkstra-build nodes)
-  (if (empty? nodes)
-      '()
-      (cons (node-state (node-id (car nodes)) (list +inf.0 #f))
-            (_graph-state-dijkstra-build (rest nodes)))))
 
 (define (graph-state-dijkstra->route graph-state root-node-id goal-node-id)
   (graph-state-disco->route graph-state root-node-id goal-node-id))
