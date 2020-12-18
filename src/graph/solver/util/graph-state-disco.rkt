@@ -1,28 +1,19 @@
 #lang racket
 
-(require "../../base/base.rkt")
+(require "../../base/base-structures.rkt")
 (require "graph-state.rkt")
 
-(provide graph-state-disco-build
-         node-state-disco-discover
+(provide node-state-disco-discover
          graph-state-disco-node-discover
-         graph-state-disco->route)
+         graph-state-disco->route
+         (all-from-out "graph-state.rkt"))
 
 (define (node-state-disco-discover _node-state discoverer-id)
   (node-state (node-state-id _node-state) (list #t discoverer-id)))
 
-(define (graph-state-disco-build graph)
-  (graph-state (_graph-state-disco-build (graph-nodes graph))))
-
-(define (_graph-state-disco-build nodes)
-  (if (empty? nodes)
-      '()
-      (cons (node-state (node-id (car nodes)) (list #f #f))
-            (_graph-state-disco-build (rest nodes)))))
-
-(define (graph-state-disco-node-discover graph-state n discoverer-id)
-  (define state (graph-state-get-node graph-state n))
-  (graph-state-set-node graph-state n (node-state-disco-discover state discoverer-id)))
+(define (graph-state-disco-node-discover graph-state id discoverer-id)
+  (define state (graph-state-get-node graph-state id))
+  (graph-state-set-node graph-state id (node-state-disco-discover state discoverer-id)))
 
 (define (graph-state-disco->route graph-state root-node-id goal-node-id)
   (define state (graph-state-get-node graph-state goal-node-id))

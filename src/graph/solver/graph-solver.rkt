@@ -1,10 +1,10 @@
 #lang racket
 
 (require "../util/graph-model-convert.rkt")
-(require (prefix-in O0: "model-O0/graph-model-O0.rkt"))
-(require (prefix-in O1: "model-O1/graph-model-O1.rkt"))
-(require (prefix-in O2: "model-O2/graph-model-O2.rkt"))
-(require (prefix-in O3: "model-O3/graph-model-O3.rkt"))
+(require (prefix-in O0: "model-O0/graph-solver.rkt"))
+(require (prefix-in O1: "model-O1/graph-solver.rkt"))
+(require (prefix-in O2: "model-O2/graph-solver.rkt"))
+(require (prefix-in O3: "model-O3/graph-solver.rkt"))
 
 (provide graph-solver-bfs
          graph-solver-dfs
@@ -20,10 +20,10 @@
   (solver (graph-model-convert graph level) root-node-id goal-node-id))
 
 (define (graph-solver-bfs graph level root-node-id goal-node-id)
-  (graph-solver graph level root-node-id goal-node-id O0:bfs void void void))
+  (graph-solver graph level root-node-id goal-node-id O0:bfs O1:bfs void void))
 (define (graph-solver-dfs graph level root-node-id goal-node-id)
-  (graph-solver graph level root-node-id goal-node-id O0:dfs void void void))
+  (graph-solver graph level root-node-id goal-node-id O0:dfs O1:dfs void void))
 (define (graph-solver-dijkstra graph level root-node-id goal-node-id)
-  (graph-solver graph level root-node-id goal-node-id O0:dijkstra void void void))
+  (graph-solver graph level root-node-id goal-node-id O0:dijkstra O1:dijkstra void void))
 (define (graph-solver-a-star graph level root-node-id goal-node-id)
-  (graph-solver graph level root-node-id goal-node-id O0:a-star void void void))
+  (graph-solver graph level root-node-id goal-node-id O0:a-star O1:a-star void void))
