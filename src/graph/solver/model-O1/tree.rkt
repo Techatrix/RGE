@@ -59,7 +59,7 @@
                             (define right-min-value (tree-node-search-min right comp))
                             (tree-node
                              left
-                             (tree-node-remove-value right right-min-value)
+                             (tree-node-remove-value right right-min-value comp)
                              right-min-value)]
                            [l? left] ; child: left
                            [r? right] ; child: right

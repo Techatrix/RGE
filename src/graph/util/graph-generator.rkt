@@ -12,7 +12,7 @@
 
 (define (graph-generate-linear node-count is-circular?)
   (define distance 100)
-  (define weight (/ distance 50))
+  (define weight (/ distance node-size))
 
   (define a 120.0)
   (define b 35.0)
@@ -71,7 +71,7 @@
 (define (graph-generate-random node-count connection-probability radius)
   (define (get-position)
     (define a (* (random) 2 pi))
-    (define r (* radius 50 (sqrt (random))))
+    (define r (* radius node-size (sqrt (random))))
     (vec2 (* r (cos a))
           (* r (sin a))))
   

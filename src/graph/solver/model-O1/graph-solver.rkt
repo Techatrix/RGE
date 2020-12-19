@@ -5,6 +5,7 @@
 
 (provide bfs
          dfs
+         dfs-sp
          dijkstra
          a-star)
 
@@ -13,6 +14,9 @@
 
 (define (dfs graph root-node-id goal-node-id)
   (solver:dfs graph searcher-O1 searcher-state-O1 root-node-id goal-node-id))
+
+(define (dfs-sp graph root-node-id goal-node-id)
+  (solver:dfs-sp graph searcher-O1 searcher-state-O1 root-node-id goal-node-id))
 
 (define (dijkstra graph root-node-id goal-node-id)
   (solver:dijkstra graph searcher-O1 searcher-state-O1 root-node-id goal-node-id))

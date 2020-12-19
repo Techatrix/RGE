@@ -105,7 +105,7 @@
       (send dc draw-line 0 0 16383 0))
 
     (define/private (draw-grid dc)
-      (define step-size 50)
+      (define step-size node-size)
 
       (define m (send (send this get-dc) get-initial-matrix))
       (define p (apply-transform dc (vec2 0 0)))
@@ -379,7 +379,7 @@
         (draw-graph graph dc selections dark-mode? draw-node-ids? draw-node-weights?)
 
         (when (and (eq? tool-id 'add-node) active)
-          (draw-point dc mouse-pos-view 50))
+          (draw-point dc mouse-pos-view node-size))
 
         (when selecting? (draw-selection-box dc)))])
     

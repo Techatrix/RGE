@@ -7,7 +7,10 @@
 (require "../../util/color.rkt")
 (require "../../util/draw-util.rkt")
 
-(provide draw-graph)
+(provide draw-graph
+         node-size)
+
+(define node-size 50.0)
 
 ; draw graph
 (define (draw-graph graph canvas-dc selections dark-mode? draw-ids? draw-weights?)
@@ -37,7 +40,7 @@
       (send canvas-dc set-pen color 1 'solid)
       (send canvas-dc set-pen color-red 2 'solid))
 
-  (draw-point canvas-dc pos 50)
+  (draw-point canvas-dc pos node-size)
   (when draw-ids?
     (define text (number->string (node-id node)))
     (define-values (w h a b) (send canvas-dc get-text-extent text))

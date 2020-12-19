@@ -4,12 +4,21 @@
 (require "graph-state.rkt")
 
 (provide node-state-disco-discover
+         graph-state-disco-get-node-found?
+         graph-state-disco-get-node-discover-id
          graph-state-disco-node-discover
          graph-state-disco->route
          (all-from-out "graph-state.rkt"))
 
+
 (define (node-state-disco-discover _node-state discoverer-id)
   (node-state (node-state-id _node-state) (list #t discoverer-id)))
+
+(define (graph-state-disco-get-node-found? graph-state id)
+  (car (node-state-data (graph-state-get-node graph-state id))))
+
+(define (graph-state-disco-get-node-discover-id graph-state id)
+  (cadr (node-state-data (graph-state-get-node graph-state id))))
 
 (define (graph-state-disco-node-discover graph-state id discoverer-id)
   (define state (graph-state-get-node graph-state id))

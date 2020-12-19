@@ -239,20 +239,22 @@
     (define agol-menu-items
       (build-menu-items
        menu-4-1
-       (list "BFS" "DFS" "Dijkstra" "A-Star")
-       (list #f #f #f #f)
+       (list "BFS" "DFS" "DFS Shortest Path" "Dijkstra" "A-Star")
+       (list #f #f #f #f #f)
        (list
         (list (eq? (get-pref 'agol-id 0) 0))
         (list (eq? (get-pref 'agol-id 0) 1))
         (list (eq? (get-pref 'agol-id 0) 2))
-        (list (eq? (get-pref 'agol-id 0) 3))) 
-       (list #f #f #f #f)
-       (list #f #f #f #f)
+        (list (eq? (get-pref 'agol-id 0) 3))
+        (list (eq? (get-pref 'agol-id 0) 4))) 
+       (list #f #f #f #f #f)
+       (list #f #f #f #f #f)
        (list
         (lambda (a b) (agol-menu-item-callback 0))
         (lambda (a b) (agol-menu-item-callback 1))
         (lambda (a b) (agol-menu-item-callback 2))
-        (lambda (a b) (agol-menu-item-callback 3)))))
+        (lambda (a b) (agol-menu-item-callback 3))
+        (lambda (a b) (agol-menu-item-callback 4)))))
     (define menu-4-2
       (new menu%
            [label "Generate Graph"]
@@ -441,8 +443,9 @@
         (case agol-id
           [(0) graph-solver-bfs]
           [(1) graph-solver-dfs]
-          [(2) graph-solver-dijkstra]
-          [(3) graph-solver-a-star]))
+          [(2) graph-solver-dfs-sp]
+          [(3) graph-solver-dijkstra]
+          [(4) graph-solver-a-star]))
       
       (define graph (send graph-canvas get-graph))
       (define root-node-id (graph-root-node-id graph))

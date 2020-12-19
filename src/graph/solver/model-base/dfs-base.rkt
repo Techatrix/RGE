@@ -27,8 +27,10 @@
 
 (define (dfs-explore-connections graph searcher state connections node-id goal-node-id)
   (cond [(empty? connections) (values state #f)]
+        [(graph-state-disco-get-node-found? state (connection-id (car connections)))
+         (dfs-explore-connections graph searcher state (rest connections) node-id goal-node-id)]
         [else (define con-id (connection-id (car connections)))
-              (define-values (new-state found)
+         (define-values (new-state found)
                 (dfs-explore-node graph searcher state node-id con-id goal-node-id))
               
               (if (eq? found #t)

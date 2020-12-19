@@ -1,0 +1,27 @@
+{
+    "nodes": [
+        {
+            "id": 1,
+            "position": {
+                "y": 0,
+                "x": 3
+            },
+            "connections": []
+        },
+        {
+            "id": 0,
+            "position": {
+                "y": 0,
+                "x": 0
+            },
+            "connections": [
+                {
+                    "id": 1,
+                    "weight": 1.0
+                }
+            ]
+        }
+    ],
+    "goal-node-id": 1,
+    "root-node-id": 0
+}
