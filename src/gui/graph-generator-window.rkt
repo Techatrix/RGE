@@ -96,10 +96,12 @@
                      [label "Connection Probability %"]
                      [min-value 0]
                      [max-value 100]
-                     [init-value (options-ref 'random-connection-probability 1)]
+                     [init-value
+                      (exact-round (* (options-ref 'random-connection-probability 0.01) 100))]
                      [callback
                       (lambda (slider _)
-                        (options-set! 'random-connection-probability (send slider get-value)))])
+                        (define value (/ (send slider get-value) 100))
+                        (options-set! 'random-connection-probability value))])
                 (new slider%
                      [parent tab-panel]
                      [label "Radius"]

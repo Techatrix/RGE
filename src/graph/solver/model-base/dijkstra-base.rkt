@@ -14,7 +14,7 @@
     (graph-state-dijkstra-node-set-distance
      (graph-state-dijkstra-build graph searcher state-searcher) root-node-id 0.0))
 
-  (define node-set (foldl (lambda (node ids) (cons (node-id node) ids)) '() (graph-nodes graph)))
+  (define node-set ((searcher-map searcher) graph (lambda (node) (node-id node))))
   
   (define-values (new-state found)
     (dijkstra-call graph searcher state node-set goal-node-id))

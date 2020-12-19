@@ -79,9 +79,25 @@
     (cond [(zero? i) '()]
           [else (cons (node i (get-position) (list)) (proc (- i 1)))]))
   
+  (define nodes (proc node-count))
+
+  (define new-nodes
+    (foldl (lambda (node result)
+             (define new-node
+               (foldl (lambda (node result-node)
+                        (if (<= (random) connection-probability)
+                            (node-add-connection result-node (connection (node-id node) 1.0))
+                            result-node))
+                      node
+                      nodes))
+             
+           (cons new-node result))
+           '()
+           nodes))
+  
   (graph-set-nodes
    (graph-make)
-   (proc node-count)))
+   new-nodes))
 
 (define graph-generate-options
   (make-weak-hasheq
@@ -92,7 +108,7 @@
      [tree-degree . 3]
      [tree-depth . 3]
      [random-node-count . 50]
-     [random-connection-probability . 1]
+     [random-connection-probability . 0.01]
      [random-radius . 20])))
 
 (define (graph-generate type)
