@@ -7,11 +7,12 @@ namespace rge::solver
 	{
 		BFS,
 		DFS,
+		DFS_SP,
 		DIJKSTRA,
 		A_STAR,
 	};
 
-	static constexpr int SolveModeLength = 4;
+	static constexpr int SolveModeLength = 5;
 
 	struct SolveResult
 	{

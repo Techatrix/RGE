@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <iostream>
 
 #include "src/core/graph.h"
 #include "src/solver/core/base.h"

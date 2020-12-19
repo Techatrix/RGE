@@ -2,36 +2,21 @@
 
 #include <deque>
 
+#include "base.h"
 #include "src/solver/core/base.h"
 #include "src/solver/core/search.h"
 #include "src/solver/core/disco.h"
 
 namespace rge::solver
 {
-	namespace
-	{
-		struct DiscoElementBFS
-		{
-			uID id;
-			bool found;
-
-			inline bool operator==(const uID &id) { return this->id == id; }
-			inline bool operator<(const uID &id) { return this->id < id; }
-			inline bool operator>(const uID &id) { return this->id < id; }
-			inline bool operator<=(const uID &id) { return !(this->id > id); }
-			inline bool operator>=(const uID &id) { return !(this->id < id); }
-
-			inline uID &get() { return id; }
-		};
-	} // namespace
 
 	template <SearcherMode SEARCHER_MODE>
 	SolveResult graphSolve_BFS(Graph &graph, uID rootNodeID, uID goalNodeID)
 	{
-		std::vector<DiscoElementBFS> disco(graph.size());
-		std::fill(disco.begin(), disco.end(), DiscoElementBFS{-1, false});
+		std::vector<DiscoElement> disco(graph.size());
+		std::fill(disco.begin(), disco.end(), DiscoElement{-1, false});
 
-		disco[rootNodeID] = DiscoElementBFS{-1, true};
+		disco[rootNodeID] = DiscoElement{-1, true};
 
 		std::deque<uID> Q;
 		Q.push_front(rootNodeID);
@@ -54,7 +39,7 @@ namespace rge::solver
 			for (auto &connection : graph.connections[nodeIndex])
 				if (!disco[connection.id].found)
 				{
-					disco[connection.id] = DiscoElementBFS{currentNodeID, true};
+					disco[connection.id] = DiscoElement{currentNodeID, true};
 					Q.push_back(connection.id);
 				}
 		}

@@ -31,12 +31,7 @@ namespace rge::solver
 		std::vector<VertexSetElement> set(graph.size());
 		std::fill(set.begin(), set.end(), VertexSetElement{INFINITY, -1});
 
-		for (size_t i = 0; i < graph.size(); i++)
-		{
-			uID &id = graph.ids[i];
-			Q.push_unqueued(id, (id == rootNodeID) ? 0 : INFINITY);
-		}
-		Q.make();
+		Q.push(rootNodeID, 0);
 		{
 			size_t i = rge::search<SEARCHER_MODE>(graph.ids.begin(), graph.ids.end(), rootNodeID) - graph.ids.begin();
 			set[i].distance = 0;
@@ -47,31 +42,27 @@ namespace rge::solver
 		{
 			uID u = Q.extract_top();
 
-			size_t uIndex = rge::search<SEARCHER_MODE>(graph.ids.begin(), graph.ids.end(), u) - graph.ids.begin();
-
-			if (graph.ids[uIndex] == goalNodeID)
+			if (u == goalNodeID)
 			{
 				found = true;
 				break;
 			}
 
+			size_t uIndex = rge::search<SEARCHER_MODE>(graph.ids.begin(), graph.ids.end(), u) - graph.ids.begin();
+
+
 			for (auto &v : graph.connections[uIndex])
 			{
-				auto iter = Q.search<LINEAR>(v.id);
+				float alt = set[uIndex].distance + v.weight;
 
-				if (iter != std::end(Q.c))
+				size_t vIndex = rge::search<SEARCHER_MODE>(graph.ids.begin(), graph.ids.end(), v.id) - graph.ids.begin();
+
+				if (alt < set[vIndex].distance)
 				{
-					float alt = set[uIndex].distance + v.weight;
+					set[vIndex].distance = alt;
+					set[vIndex].previous = uIndex;
 
-					size_t vIndex = rge::search<SEARCHER_MODE>(graph.ids.begin(), graph.ids.end(), v.id) - graph.ids.begin();
-
-					if (alt < set[vIndex].distance)
-					{
-						set[vIndex].distance = alt;
-						set[vIndex].previous = uIndex;
-
-						Q.setPriority(iter - Q.c.begin(), alt);
-					}
+					Q.push(v.id, alt);
 				}
 			}
 		}
