@@ -20,11 +20,11 @@ namespace rge
 
 			explicit operator size_type() const { return value; }
 
-			inline bool operator==(const _Element &e) { return this->value == e.value; }
-			inline bool operator<(const _Element &e) { return this->value < e.value; }
-			inline bool operator>(const _Element &e) { return this->value < e.value; }
-			inline bool operator<=(const _Element &e) { return !(this->value > e.value); }
-			inline bool operator>=(const _Element &e) { return !(this->value < e.value); }
+			inline bool operator==(const _Element &e) { return value == e.value; }
+			inline bool operator<(const _Element &e) { return value < e.value; }
+			inline bool operator>(const _Element &e) { return e.value < value; }
+			inline bool operator<=(const _Element &e) { return !(value > e.value); }
+			inline bool operator>=(const _Element &e) { return !(value < e.value); }
 		};
 
 		struct _Element_value_equality_compare
@@ -55,13 +55,12 @@ namespace rge
 
 		bool contains(value_type value) const
 		{
-			return rge::search(c.begin(), c.end(), _Element{value, 0.0}, _Element_value_equality_compare()) != std::end(c);
+			return search(value) != std::end(c);
 		}
 
-		template <SearcherMode SEARCHER_MODE>
 		auto search(value_type value)
 		{
-			return rge::search<SEARCHER_MODE>(c.begin(), c.end(), _Element{value, 0.0}, _Element_value_equality_compare());
+			return rge::search<LINEAR>(c.begin(), c.end(), _Element{value, 0.0}, _Element_value_equality_compare());
 		}
 
 		void push(value_type value, priority_type priority)
@@ -114,14 +113,6 @@ namespace rge
 		void clear()
 		{
 			c.clear();
-		}
-
-		void setPriority(size_type index, priority_type priority)
-		{
-			assert(index < c.size());
-			value_type __v = c[index].value;
-			c.erase(c.begin() + index);
-			push(__v, priority);
 		}
 	};
 } // namespace rge

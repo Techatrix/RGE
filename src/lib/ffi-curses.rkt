@@ -18,9 +18,8 @@
                    (build-path (find-system-path 'pref-dir) "rge-prefs.rktd")))
 
 (define ffi-lib-path
-  (if (string? ffi-lib-path-pref)
-      (string->path ffi-lib-path-pref)
-      #f))
+  (cond [(and (path-string? ffi-lib-path-pref) (file-exists? ffi-lib-path-pref)) ffi-lib-path-pref]
+        [else #f]))
 
 (define-values (lib is-available)
   (cond [(not ffi-lib-path) (values #f #f)]

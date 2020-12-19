@@ -16,8 +16,8 @@ namespace rge::solver
 	{
 		T operator()(Graph *graph, uID rootNodeID, uID goalNodeID) const
 		{
-			constexpr SolveMode solveMode = (SolveMode)(N / 4);
-			constexpr SearcherMode searcherMode = (SearcherMode)(N % 4);
+			constexpr SolveMode solveMode = (SolveMode)(N / SolveModeLength);
+			constexpr SearcherMode searcherMode = (SearcherMode)(N % SolveModeLength);
 			return solve<solveMode, searcherMode>(graph, rootNodeID, goalNodeID);
 		}
 	};
@@ -33,6 +33,8 @@ namespace rge::solver
 			return graphSolve_BFS<SEARCHER_MODE>(*graph, rootNodeID, goalNodeID);
 		case DFS:
 			return graphSolve_DFS<SEARCHER_MODE>(*graph, rootNodeID, goalNodeID);
+		case DFS_SP:
+			return graphSolve_DFS_SP<SEARCHER_MODE>(*graph, rootNodeID, goalNodeID);
 		case DIJKSTRA:
 			return graphSolve_DIJKSTRA<SEARCHER_MODE>(*graph, rootNodeID, goalNodeID);
 		case A_STAR:

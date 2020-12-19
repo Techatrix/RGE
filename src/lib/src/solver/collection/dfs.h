@@ -1,29 +1,13 @@
 #pragma once
 
+#include "base.h"
 #include "src/solver/core/base.h"
 #include "src/solver/core/search.h"
 
 namespace rge::solver
 {
-	namespace
-	{
-		struct DiscoElementDFS
-		{
-			uID id;
-			bool found;
-
-			inline bool operator==(const uID &id) { return this->id == id; }
-			inline bool operator<(const uID &id) { return this->id < id; }
-			inline bool operator>(const uID &id) { return this->id < id; }
-			inline bool operator<=(const uID &id) { return !(this->id > id); }
-			inline bool operator>=(const uID &id) { return !(this->id < id); }
-
-			inline uID &get() { return id; }
-		};
-	} // namespace
-
 	template <SearcherMode SEARCHER_MODE>
-	bool graphSolve_DFS_Disco(Graph &graph, uID currentNodeID, uID goalNodeID, std::vector<DiscoElementDFS> &disco)
+	bool graphSolve_DFS_Disco(Graph &graph, uID currentNodeID, uID goalNodeID, std::vector<DiscoElement> &disco)
 	{
 		if (currentNodeID == goalNodeID)
 			return true;
@@ -33,7 +17,7 @@ namespace rge::solver
 		for (auto &connection : graph.connections[nodeIndex])
 			if (!disco[connection.id].found)
 			{
-				disco[connection.id] = DiscoElementDFS{currentNodeID, true};
+				disco[connection.id] = DiscoElement{currentNodeID, true};
 				if (graphSolve_DFS_Disco<SEARCHER_MODE>(graph, connection.id, goalNodeID, disco))
 					return true;
 			}
@@ -44,10 +28,10 @@ namespace rge::solver
 	template <SearcherMode SEARCHER_MODE>
 	SolveResult graphSolve_DFS(Graph &graph, uID rootNodeID, uID goalNodeID)
 	{
-		std::vector<DiscoElementDFS> disco(graph.size());
-		std::fill(disco.begin(), disco.end(), DiscoElementDFS{-1, false});
+		std::vector<DiscoElement> disco(graph.size());
+		std::fill(disco.begin(), disco.end(), DiscoElement{-1, false});
 
-		disco[rootNodeID] = DiscoElementDFS{-1, true};
+		disco[rootNodeID] = DiscoElement{-1, true};
 
 		bool found = graphSolve_DFS_Disco<SEARCHER_MODE>(graph, rootNodeID, goalNodeID, disco);
 
