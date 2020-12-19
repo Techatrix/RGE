@@ -33,11 +33,7 @@
          (define-values (new-state found)
                 (dfs-explore-node graph searcher state node-id con-id goal-node-id))
               
-              (if (eq? found #t)
-                  (values new-state found)
-                  (dfs-explore-connections
-                   graph
-                   new-state
-                   (rest connections)
-                   node-id
-                   goal-node-id))]))
+         (if (eq? found #t)
+             (values new-state found)
+             (dfs-explore-connections
+              graph searcher new-state (rest connections) node-id goal-node-id))]))
