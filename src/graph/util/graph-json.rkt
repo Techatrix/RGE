@@ -10,9 +10,12 @@
          read-json-graph
          write-json-graph)
 
+(define (round-decimal-1 x)
+  (/ (round (* 10 x)) 10))
+
 (define (vec2->jsexpr vec2)
-  (hasheq 'x (vec2-x vec2)
-          'y (vec2-y vec2)))
+  (hasheq 'x (round-decimal-1 (/ (vec2-x vec2) node-size))
+          'y (round-decimal-1 (/ (vec2-y vec2) node-size))))
 
 (define (connection->jsexpr connection)
   (hasheq 'id (connection-id connection)
@@ -41,8 +44,8 @@
 
 
 (define (jsexpr->vec2 hash)
-  (vec2 (hash-ref hash 'x)
-        (hash-ref hash 'y)))
+  (vec2 (* (hash-ref hash 'x) node-size)
+        (* (hash-ref hash 'y) node-size)))
 
 (define (jsexpr->connection hash)
   (connection (hash-ref hash 'id)

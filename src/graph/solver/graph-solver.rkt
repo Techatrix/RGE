@@ -8,6 +8,7 @@
 
 (provide graph-solver-bfs
          graph-solver-dfs
+         graph-solver-dfs-sp
          graph-solver-dijkstra
          graph-solver-a-star)
 
@@ -23,6 +24,8 @@
   (graph-solver graph level root-node-id goal-node-id O0:bfs O1:bfs void void))
 (define (graph-solver-dfs graph level root-node-id goal-node-id)
   (graph-solver graph level root-node-id goal-node-id O0:dfs O1:dfs void void))
+(define (graph-solver-dfs-sp graph level root-node-id goal-node-id)
+  (graph-solver graph level root-node-id goal-node-id O0:dfs-sp O1:dfs-sp void void))
 (define (graph-solver-dijkstra graph level root-node-id goal-node-id)
   (graph-solver graph level root-node-id goal-node-id O0:dijkstra O1:dijkstra void void))
 (define (graph-solver-a-star graph level root-node-id goal-node-id)
