@@ -20,17 +20,17 @@
 (define (graph-state-add-node state id data)
   (graph-state-set-nodes state
                          ((searcher-add (graph-state-searcher state))
-                          state (node-state id data))))
+                          (graph-state-nodes state) (node-state id data))))
 
 (define (graph-state-remove-node state id)
   (graph-state-set-nodes state
                          ((searcher-remove (graph-state-searcher state))
-                          state id)))
+                          (graph-state-nodes state) (node-state id #f))))
 
 (define (graph-state-get-node state id)
-  ((searcher-get (graph-state-searcher state)) state id))
+  ((searcher-get (graph-state-searcher state)) (graph-state-nodes state) (node-state id #f)))
 
-(define (graph-state-set-node state id node-state)
+(define (graph-state-set-node state id _node-state)
   (graph-state-set-nodes state
                          ((searcher-set (graph-state-searcher state))
-                          state id node-state)))
+                          (graph-state-nodes state) (node-state id #f) _node-state)))

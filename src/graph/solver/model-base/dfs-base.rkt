@@ -14,7 +14,7 @@
   (define-values (new-state found)
     (dfs-explore-node graph searcher state root-node-id root-node-id goal-node-id))
   
-  (if (eq? found #t)
+  (if found
       (graph-state-disco->route new-state root-node-id goal-node-id)
       #f))
 
@@ -22,17 +22,20 @@
   (define new-state (graph-state-disco-node-discover state node-id origin-node-id))
   
   (cond [(eq? node-id goal-node-id) (values new-state #t)]
-        [else (define connections (node-connections ((searcher-get searcher) graph node-id)))
-              (dfs-explore-connections graph searcher new-state connections node-id goal-node-id)]))
+        [else 
+         (define connections
+           (node-connections ((searcher-get searcher) (graph-nodes graph) (node node-id #f #f))))
+         (dfs-explore-connections graph searcher new-state connections node-id goal-node-id)]))
 
 (define (dfs-explore-connections graph searcher state connections node-id goal-node-id)
   (cond [(empty? connections) (values state #f)]
         [(graph-state-disco-get-node-found? state (connection-id (car connections)))
          (dfs-explore-connections graph searcher state (rest connections) node-id goal-node-id)]
-        [else (define con-id (connection-id (car connections)))
+        [else
+         (define con-id (connection-id (car connections)))
          (define-values (new-state found)
-                (dfs-explore-node graph searcher state node-id con-id goal-node-id))
-              
+           (dfs-explore-node graph searcher state node-id con-id goal-node-id))
+         
          (if (eq? found #t)
              (values new-state found)
              (dfs-explore-connections

@@ -28,7 +28,8 @@
   
   (cond [(eq? node-id goal-node-id) (dfs-result #t distance new-state)]
         [else
-         (define connections (node-connections ((searcher-get searcher) graph node-id)))
+         (define connections
+           (node-connections ((searcher-get searcher) (graph-nodes graph) (node node-id #f #f))))
          (dfs-sp-explore-connections
                 graph searcher new-state
                 connections node-id goal-node-id

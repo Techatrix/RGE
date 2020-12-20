@@ -14,7 +14,8 @@
     (graph-state-dijkstra-node-set-distance
      (graph-state-dijkstra-build graph searcher state-searcher) root-node-id 0.0))
 
-  (define node-set ((searcher-map searcher) graph (lambda (node) (node-id node))))
+  (define node-set ((searcher-list searcher)
+                    ((searcher-map searcher) (graph-nodes graph) (lambda (node) (node-id node)))))
   
   (define-values (new-state found)
     (dijkstra-call graph searcher state node-set goal-node-id))
@@ -68,4 +69,4 @@
                    [else state]))
            
            (proc new-state (rest connections))]))
-  (proc _state (node-connections ((searcher-get searcher) graph id))))
+  (proc _state (node-connections ((searcher-get searcher) (graph-nodes graph) (node id #f #f)))))
