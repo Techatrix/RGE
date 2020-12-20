@@ -5,21 +5,24 @@
 (require "../util/graph-state.rkt")
 (require "tree.rkt")
 
-(provide searcher-O1
+(provide searcher-graph-O1
          searcher-state-O1)
 
-(define (searcher-builder proc1 proc2 proc3)
-  (define comp
-    (lambda (node1 node2)
-      (< (proc2 node1) (proc2 node2))))
-  (searcher
-   (lambda (data id) (tree-node-search (proc1 data) (proc3 id) comp))
-   (lambda (data id value) (tree-node-replace-value (proc1 data) (proc3 id) value comp))
-   (lambda (data value) (tree-node-insert-value (proc1 data) value comp))
-   (lambda (data id) (tree-node-remove-value (proc1 data) (proc3 id) comp))
-   (lambda (data proc) (tree-node-map (proc1 data) proc))))
+(define (get-comp proc) (lambda (v1 v2) (< (proc v1) (proc v2))))
 
-(define searcher-O1
-  (searcher-builder graph-nodes node-id (lambda (id) (node id #f #f))))
-(define searcher-state-O1
-  (searcher-builder graph-state-nodes node-state-id (lambda (id) (node-state id '()))))
+(define (searcher-builder-O1 proc-get-value)
+  (searcher
+   (lambda (data value [proc proc-get-value])
+     (tree-node-search data value (get-comp proc)))
+   (lambda (data old-value new-value [proc proc-get-value])
+     (tree-node-replace-value data old-value new-value (get-comp proc)))
+   (lambda (data value [proc proc-get-value])
+     (tree-node-insert-value data value (get-comp proc)))
+   (lambda (data value [proc proc-get-value])
+     (tree-node-remove-value data value (get-comp proc)))
+   (lambda (data proc)
+     (tree-node-map data proc))
+   (lambda (data) (tree-node->list data))))
+
+(define searcher-graph-O1 (searcher-builder-O1 node-id))
+(define searcher-state-O1 (searcher-builder-O1 node-state-id))

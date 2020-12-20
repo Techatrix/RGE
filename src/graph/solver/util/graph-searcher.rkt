@@ -2,4 +2,4 @@
 
 (provide (struct-out searcher))
 
-(struct searcher (get set add remove map))
+(struct searcher (get set add remove map list))

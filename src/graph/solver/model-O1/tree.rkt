@@ -6,7 +6,8 @@
          tree-node-replace-value
          tree-node-search
          tree-node-search-min
-         tree-node-map)
+         tree-node-map
+         tree-node->list)
 
 (struct tree-node (left right value) #:transparent)
 
@@ -79,7 +80,7 @@
         [(comp node-value value) (tree-node-search right value comp)]
         [else node-value]))
 
-(define (tree-node-search-min tree comp)
+(define (tree-node-search-min tree [comp <])
   (cond [(tree-node? tree)
          (define left (tree-node-left tree))
          (if (tree-node? left)
@@ -94,3 +95,9 @@
           (tree-node-map (tree-node-right tree) proc)
           (proc (tree-node-value tree)))
       #f))
+
+(define (tree-node->list tree)
+  (if (tree-node? tree)
+      (append (tree-node->list (tree-node-left tree))
+              (cons (tree-node-value tree) (tree-node->list (tree-node-right tree))))
+      '()))

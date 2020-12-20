@@ -9,14 +9,14 @@
 
 (define (graph-state-disco-build graph searcher state-searcher)
   (graph-state
-   ((searcher-map searcher) graph
+   ((searcher-map searcher) (graph-nodes graph)
      (lambda (node)
        (node-state (node-id node) (list #f #f))))
    state-searcher))
 
 (define (graph-state-dijkstra-build graph searcher state-searcher)
   (graph-state
-   ((searcher-map searcher) graph
+   ((searcher-map searcher) (graph-nodes graph)
      (lambda (node)
        (node-state (node-id node) (list +inf.0 #f))))
    state-searcher))

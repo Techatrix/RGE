@@ -5,16 +5,39 @@
 (require "../util/graph-searcher.rkt")
 (require "../util/graph-state.rkt")
 
-(provide searcher-O0
+(provide searcher-graph-O0
          searcher-state-O0)
 
-(define (searcher-builder proc1 proc2)
-  (searcher
-   (lambda (data id) (list-search (proc1 data) (lambda (node) (eq? (proc2 node) id))))
-   (lambda (data id value) (list-replace (proc1 data) (lambda (node) (eq? (proc2 node) id)) value))
-   (lambda (data value) (cons value (proc1 data)))
-   (lambda (data id) (list-remove (proc1 data) (lambda (node) (eq? (proc2 node) id))))
-   (lambda (data proc) (map (lambda (node) (proc node)) (proc1 data)))))
+(define (get-comp proc) (lambda (v1 v2) (eq? (proc v1) (proc v2))))
 
-(define searcher-O0 (searcher-builder graph-nodes node-id))
-(define searcher-state-O0 (searcher-builder graph-state-nodes node-state-id))
+(define (list-search-comp lst v [proc eq?])
+  (cond [(empty? lst) #f]
+        [(proc v (car lst)) (car lst)]
+        [else (list-search-comp (rest lst) v proc)]))
+
+(define (list-replace-comp lst old-value new-value [proc eq?])
+  (cond [(empty? lst) '()]
+        [else (cons (if (proc old-value (car lst)) new-value (car lst))
+                    (list-replace-comp (rest lst) old-value new-value proc))]))
+
+(define (list-remove-comp lst v [proc eq?])
+  (cond [(empty? lst) '()]
+        [(proc v (car lst)) (list-remove-comp (rest lst) v proc)]
+        [else (cons (car lst) (list-remove-comp (rest lst) v proc))]))
+
+(define (searcher-builder-O0 proc-get-value)
+  (searcher
+   (lambda (data value [proc proc-get-value])
+     (list-search-comp data value (get-comp proc)))
+   (lambda (data old-value new-value [proc proc-get-value])
+     (list-replace-comp data old-value new-value (get-comp proc)))
+   (lambda (data value [proc proc-get-value])
+     (cons value data))
+   (lambda (data value [proc proc-get-value])
+     (list-remove-comp data value (get-comp proc)))
+   (lambda (data proc)
+     (map (lambda (node) (proc node)) data))
+   (lambda (data) data)))
+
+(define searcher-graph-O0 (searcher-builder-O0 node-id))
+(define searcher-state-O0 (searcher-builder-O0 node-state-id))
