@@ -3,8 +3,8 @@
 #include <deque>
 
 #include "base.h"
+#include "src/util/search.h"
 #include "src/solver/core/base.h"
-#include "src/solver/core/search.h"
 #include "src/solver/core/disco.h"
 
 namespace rge::solver
@@ -21,29 +21,28 @@ namespace rge::solver
 		std::deque<uID> Q;
 		Q.push_front(rootNodeID);
 
-		bool found = false;
-
 		while (!Q.empty())
 		{
 			uID currentNodeID = Q.front();
 			Q.pop_front();
 
 			if (currentNodeID == goalNodeID)
-			{
-				found = true;
-				break;
-			}
+				return SolveResult{SUCCESS, discoParse(graph, std::move(disco), rootNodeID, goalNodeID)};
 
-			size_t nodeIndex = rge::search<SEARCHER_MODE>(graph.ids.begin(), graph.ids.end(), currentNodeID) - graph.ids.begin();
+			size_t nodeIndex = graph.searchEntry<SEARCHER_MODE>(currentNodeID);
 
 			for (auto &connection : graph.connections[nodeIndex])
-				if (!disco[connection.id].found)
+			{
+				size_t connectionIndex = graph.searchEntry<SEARCHER_MODE>(connection.id);
+
+				if (!disco[connectionIndex].found)
 				{
-					disco[connection.id] = DiscoElement{currentNodeID, true};
-					Q.push_back(connection.id);
+					disco[connectionIndex] = DiscoElement{currentNodeID, true};
+					Q.push_back(connectionIndex);
 				}
+			}
 		}
 
-		return SolveResult{found, discoParse(graph, std::move(disco), rootNodeID, goalNodeID)};
+		return SolveResult{NO_PATH};
 	}
 } // namespace rge::solver

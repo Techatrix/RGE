@@ -1,8 +1,8 @@
 #pragma once
 
 #include "base.h"
+#include "src/util/search.h"
 #include "src/solver/core/base.h"
-#include "src/solver/core/search.h"
 
 namespace rge::solver
 {
@@ -12,15 +12,19 @@ namespace rge::solver
 		if (currentNodeID == goalNodeID)
 			return true;
 
-		size_t nodeIndex = rge::search<SEARCHER_MODE>(graph.ids.begin(), graph.ids.end(), currentNodeID) - graph.ids.begin();
+		size_t nodeIndex = graph.searchEntry<SEARCHER_MODE>(currentNodeID);
 
 		for (auto &connection : graph.connections[nodeIndex])
-			if (!disco[connection.id].found)
+		{
+			size_t connectionIndex = graph.searchEntry<SEARCHER_MODE>(connection.id);
+
+			if (!disco[connectionIndex].found)
 			{
-				disco[connection.id] = DiscoElement{currentNodeID, true};
+				disco[connectionIndex] = DiscoElement{currentNodeID, true};
 				if (graphSolve_DFS_Disco<SEARCHER_MODE>(graph, connection.id, goalNodeID, disco))
 					return true;
 			}
+		}
 
 		return false;
 	}
@@ -35,7 +39,10 @@ namespace rge::solver
 
 		bool found = graphSolve_DFS_Disco<SEARCHER_MODE>(graph, rootNodeID, goalNodeID, disco);
 
-		return SolveResult{found, discoParse(graph, std::move(disco), rootNodeID, goalNodeID)};
+		if(found)
+			return SolveResult{SUCCESS, discoParse(graph, std::move(disco), rootNodeID, goalNodeID)};
+		else
+			return SolveResult{NO_PATH};
 	}
 
 } // namespace rge::solver

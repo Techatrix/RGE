@@ -7,12 +7,12 @@ using namespace rge;
 
 Graph *graphMake(size_t nodeCount, uID *ids, Vector2 *positions, size_t *connectionCounts, Connection **connections)
 {
-	Graph *graph = new Graph();
-
-	graph->ids = std::vector<uID>(nodeCount);
-	graph->positions = std::vector<Vector2>(nodeCount);
-	graph->connections = std::vector<std::vector<Connection>>(nodeCount);
-
+	Graph *graph = new Graph{
+		std::vector<uID>(nodeCount),
+		std::vector<Vector2>(nodeCount),
+		std::vector<std::vector<Connection>>(nodeCount),
+	};
+	
 	for (size_t i = 0; i < nodeCount; i++)
 	{
 		uID& id = ids[i];
@@ -24,6 +24,9 @@ Graph *graphMake(size_t nodeCount, uID *ids, Vector2 *positions, size_t *connect
 		graph->connections[id] = std::move(c);
 	}
 
+	if(!std::is_sorted(graph->ids.begin(), graph->ids.end()))
+		graph->sort();
+
 	return graph;
 }
 
@@ -33,12 +36,12 @@ solver::SolveResult *graphSolve(Graph *graph, uID rootNodeID, uID goalNodeID, so
 	int index = solveMode * solver::SolveModeLength + searcherMode;
 	auto result = TemplateGeneratorSwitch<SIZE, solver::GSW, solver::SolveResult, Graph *, uID, uID>::impl(index, graph, rootNodeID, goalNodeID);
 
-	return new solver::SolveResult{result.found, std::move(result.path)};
+	return new solver::SolveResult(result);
 }
 
-bool graphSolveResultIsFound(solver::SolveResult *result)
+int graphSolveResultResponse(solver::SolveResult *result)
 {
-	return result->found;
+	return result->response;
 }
 
 size_t graphSolveResultPathSize(solver::SolveResult *result)

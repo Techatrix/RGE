@@ -36,7 +36,7 @@ extern "C"
 
 	DLL_PUBLIC rge::solver::SolveResult *graphSolve(rge::Graph *graph, rge::uID rootNodeID, rge::uID goalNodeID, rge::solver::SolveMode solveMode, rge::SearcherMode searcherMode);
 
-	DLL_PUBLIC bool graphSolveResultIsFound(rge::solver::SolveResult *result);
+	DLL_PUBLIC int graphSolveResultResponse(rge::solver::SolveResult *result);
 
 	DLL_PUBLIC size_t graphSolveResultPathSize(rge::solver::SolveResult *result);
 	DLL_PUBLIC void graphSolveResultPath(rge::solver::SolveResult *result, rge::uID *path);

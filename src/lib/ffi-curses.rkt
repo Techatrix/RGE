@@ -5,7 +5,7 @@
 
 (provide graphMake
          graphSolve
-         graphSolveResultIsFound
+         graphSolveResultResponse
          graphSolveResultPathSize
          graphSolveResultPath
          printGraph
@@ -60,10 +60,10 @@
    [searcherMode : _int]
    -> _SolveResult-pointer))
 
-(define-curses graphSolveResultIsFound
+(define-curses graphSolveResultResponse
   (_fun
    [result : _SolveResult-pointer]
-   -> _stdbool))
+   -> _int))
 
 (define-curses graphSolveResultPathSize
   (_fun
