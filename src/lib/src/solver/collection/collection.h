@@ -4,3 +4,4 @@
 #include "dfs.h"
 #include "dfs_sp.h"
 #include "dijkstra.h"
+#include "a-star.h"

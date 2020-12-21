@@ -1,8 +1,8 @@
 #pragma once
 
+#include "src/util/search.h"
 #include "src/solver/core/base.h"
-#include "src/solver/core/search.h"
-#include "src/solver/core/priority_queue.h"
+#include "src/solver/core/indexed_min_heap_priority_queue.h"
 
 namespace rge::solver
 {
@@ -14,10 +14,11 @@ namespace rge::solver
 			uID previous;
 
 			inline bool operator==(const uID &previous) { return this->previous == previous; }
+			inline bool operator!=(const uID &previous) { return !(*this == previous); }
 			inline bool operator<(const uID &previous) { return this->previous < previous; }
-			inline bool operator>(const uID &previous) { return this->previous < previous; }
-			inline bool operator<=(const uID &previous) { return !(this->previous > previous); }
-			inline bool operator>=(const uID &previous) { return !(this->previous < previous); }
+			inline bool operator>(const uID &previous) { return this->previous > previous; }
+			inline bool operator<=(const uID &previous) { return !(*this > previous); }
+			inline bool operator>=(const uID &previous) { return !(*this < previous); }
 
 			inline uID &get() { return previous; }
 		};
@@ -26,47 +27,44 @@ namespace rge::solver
 	template <SearcherMode SEARCHER_MODE>
 	SolveResult graphSolve_DIJKSTRA(Graph &graph, uID rootNodeID, uID goalNodeID)
 	{
-		PriorityQueue<uID, float, std::greater<float>> Q;
+		IndexedMinHeapPriorityQueue<uID> Q;
 
 		std::vector<VertexSetElement> set(graph.size());
 		std::fill(set.begin(), set.end(), VertexSetElement{INFINITY, -1});
 
-		Q.push(rootNodeID, 0);
-		{
-			size_t i = rge::search<SEARCHER_MODE>(graph.ids.begin(), graph.ids.end(), rootNodeID) - graph.ids.begin();
-			set[i].distance = 0;
-		}
+		for (auto &id : graph.ids)
+			Q.insert(id, (id == rootNodeID) ? 0.0f : INFINITY);
 
-		bool found = false;
+		set[graph.searchEntry<SEARCHER_MODE>(rootNodeID)].distance = 0;
+
 		while (!Q.empty())
 		{
-			uID u = Q.extract_top();
+			uID u = Q.extractMin();
 
 			if (u == goalNodeID)
-			{
-				found = true;
-				break;
-			}
+				return SolveResult{SUCCESS, discoParse(graph, std::move(set), rootNodeID, goalNodeID)};
 
-			size_t uIndex = rge::search<SEARCHER_MODE>(graph.ids.begin(), graph.ids.end(), u) - graph.ids.begin();
-
+			size_t uIndex = graph.searchEntry<SEARCHER_MODE>(u);
 
 			for (auto &v : graph.connections[uIndex])
 			{
-				float alt = set[uIndex].distance + v.weight;
-
-				size_t vIndex = rge::search<SEARCHER_MODE>(graph.ids.begin(), graph.ids.end(), v.id) - graph.ids.begin();
-
-				if (alt < set[vIndex].distance)
+				if(Q.hasKey(v.id))
 				{
-					set[vIndex].distance = alt;
-					set[vIndex].previous = uIndex;
+					float alt = set[uIndex].distance + v.weight;
 
-					Q.push(v.id, alt);
+					size_t vIndex = graph.searchEntry<SEARCHER_MODE>(v.id);
+
+					if (alt < set[vIndex].distance)
+					{
+						set[vIndex].distance = alt;
+						set[vIndex].previous = uIndex;
+
+						Q.decreaseKey(v.id, alt);
+					}
 				}
 			}
 		}
 
-		return SolveResult{found, discoParse(graph, std::move(set), rootNodeID, goalNodeID)};
+		return SolveResult{NO_PATH};
 	}
 } // namespace rge::solver

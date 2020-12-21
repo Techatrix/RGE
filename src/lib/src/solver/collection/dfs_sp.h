@@ -3,8 +3,8 @@
 #include <optional>
 
 #include "base.h"
+#include "src/util/search.h"
 #include "src/solver/core/base.h"
-#include "src/solver/core/search.h"
 
 
 namespace rge::solver
@@ -18,7 +18,7 @@ namespace rge::solver
 	template <SearcherMode SEARCHER_MODE>
     std::optional<DFSState> graphSolve_DFS_SP_Disco(Graph& graph, uID previousNodeID, uID currentNodeID, uID goalNodeID, std::vector<DiscoElement>& pathState, float distanceFromRootNode)
     {
-		size_t nodeIndex = rge::search<SEARCHER_MODE>(graph.ids.begin(), graph.ids.end(), currentNodeID) - graph.ids.begin();
+		size_t nodeIndex = graph.searchEntry<SEARCHER_MODE>(currentNodeID);
 		if(currentNodeID == goalNodeID) {
 			auto disco = pathState;
 			disco[nodeIndex] = DiscoElement{previousNodeID, true};
@@ -32,7 +32,10 @@ namespace rge::solver
 		DFSState currentBestState;
 
 		for (auto &connection : graph.connections[nodeIndex])
-			if (!pathState[connection.id].found)
+		{
+			size_t connectionIndex = graph.searchEntry<SEARCHER_MODE>(connection.id);
+
+			if (!pathState[connectionIndex].found)
 			{
 				auto result = graphSolve_DFS_SP_Disco<SEARCHER_MODE>(graph, currentNodeID, connection.id, goalNodeID, pathState, distanceFromRootNode + connection.weight );
 				if(result && (!foundState || (result.value().distance < currentBestState.distance)))
@@ -41,6 +44,7 @@ namespace rge::solver
 					currentBestState = std::move(result.value());
 				}
 			}
+		}
         
 		pathState[nodeIndex] = oldDiscoState;
 		
@@ -60,9 +64,9 @@ namespace rge::solver
 		auto result = graphSolve_DFS_SP_Disco<SEARCHER_MODE>(graph, -1, rootNodeID, goalNodeID, disco, 0.0f);
 
 		if(result)
-			return SolveResult{true, discoParse(graph, std::move(result.value().disco), rootNodeID, goalNodeID)};
+			return SolveResult{SUCCESS, discoParse(graph, std::move(result.value().disco), rootNodeID, goalNodeID)};
 		else
-			return SolveResult{false, std::vector<uID>()};
+			return SolveResult{NO_PATH};
     }
 
 } // namespace rge::solver

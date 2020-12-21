@@ -5,7 +5,6 @@
 
 #include "src/core/graph.h"
 #include "src/solver/core/base.h"
-#include "src/solver/core/search.h"
 
 namespace rge::solver
 {

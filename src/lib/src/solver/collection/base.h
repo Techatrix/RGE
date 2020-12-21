@@ -10,10 +10,11 @@ namespace rge::solver
 		bool found;
 
 		inline bool operator==(const uID &id) { return this->id == id; }
+		inline bool operator!=(const uID &id) { return !(*this == id); }
 		inline bool operator<(const uID &id) { return this->id < id; }
-		inline bool operator>(const uID &id) { return this->id < id; }
-		inline bool operator<=(const uID &id) { return !(this->id > id); }
-		inline bool operator>=(const uID &id) { return !(this->id < id); }
+		inline bool operator>(const uID &id) { return this->id > id; }
+		inline bool operator<=(const uID &id) { return !(*this > id); }
+		inline bool operator>=(const uID &id) { return !(*this < id); }
 
 		inline uID &get() { return id; }
 	};

@@ -3,7 +3,7 @@
 #include <stdexcept>
 
 #include "core/base.h"
-#include "src/solver/core/search.h"
+#include "src/util/search.h"
 #include "collection/collection.h"
 
 namespace rge::solver
@@ -25,8 +25,15 @@ namespace rge::solver
 	template <SolveMode SOLVE_MODE, SearcherMode SEARCHER_MODE>
 	SolveResult solve(Graph *graph, uID rootNodeID, uID goalNodeID)
 	{
-		// TODO: assert if rootNodeID or goalNodeID dont exist
-		// TODO: verify SearchMode e.g: check if CONSTANT is possible
+		if(!(0 <= SEARCHER_MODE && SEARCHER_MODE < SearcherModeLength))
+			return SolveResult{INVALID_SEARCHER_MODE};
+		if( SEARCHER_MODE == CONSTANT && !graph->hasLinearIDs())
+			return SolveResult{INVALID_SEARCHER_MODE};
+		if(!(graph->searchEntry<SEARCHER_MODE>(rootNodeID) < graph->size()))
+			return SolveResult{INVALID_ROOT};
+		if(!(graph->searchEntry<SEARCHER_MODE>(rootNodeID) < graph->size()))
+			return SolveResult{INVALID_GOAL};
+
 		switch (SOLVE_MODE)
 		{
 		case BFS:
@@ -38,10 +45,9 @@ namespace rge::solver
 		case DIJKSTRA:
 			return graphSolve_DIJKSTRA<SEARCHER_MODE>(*graph, rootNodeID, goalNodeID);
 		case A_STAR:
-			//graphSolve_A_STAR<SEARCHER_MODE>(graph, rootNodeID, goalNodeID);
+			return graphSolve_A_STAR<SEARCHER_MODE>(*graph, rootNodeID, goalNodeID);
 		default:
-			throw std::runtime_error("Invalid Solver Mode");
+			return SolveResult{INVALID_SOLVE_MODE};
 		}
-		throw std::runtime_error("Invalid Solver Mode");
 	}
 } // namespace rge::solver

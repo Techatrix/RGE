@@ -14,9 +14,20 @@ namespace rge::solver
 
 	static constexpr int SolveModeLength = 5;
 
+	enum SolveResponse
+	{
+		SUCCESS,
+		ERROR,
+		NO_PATH,
+		INVALID_ROOT,
+		INVALID_GOAL,
+		INVALID_SOLVE_MODE,
+		INVALID_SEARCHER_MODE,
+	};
+
 	struct SolveResult
 	{
-		bool found;
+		SolveResponse response;
 		std::vector<uID> path;
 	};
 } // namespace rge::solver
