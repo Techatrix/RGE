@@ -3,6 +3,7 @@
 (require "graph-canvas.rkt")
 (require "data-tab-panel.rkt")
 (require "graph-generator-window.rkt")
+(require "about-window.rkt")
 (require "../graph/graph.rkt")
 (require "../util/util.rkt")
 (require "../util/timer.rkt")
@@ -19,12 +20,31 @@
          [height 600]
          [min-width 300]
          [min-height 300]))
+  (send gui center)
   (send gui show #t))
 
 (define gui%
   (class frame%
     (super-new)
 
+    (inherit on-exit)
+    
+    (define/public (close)
+      (when (can-close?) (on-exit)))
+    
+    (define/augment (can-close?)
+      (define (proc i)
+        (and
+         (graph-tab-request-save-if-required (send panel get-tab i))
+         (if (< 0 i)
+             (proc (- i 1))
+             #t)))
+      
+      (define tab-count (send panel get-number))
+      (if (< 0 tab-count)
+            (proc (- tab-count 1))
+            #t))
+    
     (define/public (get-canvas) graph-canvas)
     
     (define (build-menu-items
@@ -77,14 +97,13 @@
      (list
       (lambda (a b) (new-gui))
       (lambda (a b)
-        (send panel add-tab "Untitled")
+        (send panel add-tab "untitled")
         (panel-set-selection (send panel get-selection)))
       (lambda (a b) (load-graph-tab))
       (lambda (a b) (save-graph-tab #f))
       (lambda (a b) (save-graph-tab #t))
       (lambda (a b) (close-graph-tab))
-      (lambda (a b) (exit)) ; TODO: add check
-      ))
+      (lambda (a b) (close))))
   
     ; Edit Menu
     (define menu-2
@@ -112,9 +131,8 @@
         (define nodes (graph-nodes (send graph-canvas get-graph)))
         (send graph-canvas set-selections! (map node-id nodes)))
       (lambda (a b)
-        (cond [(eq? (message-box "Confirm" "Are you sure?" this (list 'ok-cancel)) 'ok)
-               (send graph-canvas action-reset)]))
-      ))
+        (cond [(eq? (message-box "Confirm" "Are you sure?" this (list 'yes-no 'no-icon)) 'yes)
+               (send graph-canvas action-reset)]))))
     
     ; View Menu
     (define menu-3
@@ -271,7 +289,7 @@
       (lambda (a b) (send graph-canvas set-graph! (graph-generate 'star)))
       (lambda (a b) (send graph-canvas set-graph! (graph-generate 'tree)))
       (lambda (a b) (send graph-canvas set-graph! (graph-generate 'random)))
-      (lambda (a b) (open-graph-generate-frame this))))
+      (lambda (a b) (open-graph-generator-window this))))
 
     (new separator-menu-item% [parent menu-4])
 
@@ -354,37 +372,54 @@
          [parent menu-6]
          [callback
           (lambda (item event)
-            (displayln "About RGE"))])
+            (open-about-window this))])
 
     (define (path-get-filename path)
       (car (string-split (path->string (file-name-from-path path)) ".")))
-
-    (define (ask-graph-save-path label)
-      (put-file label this #f "graph" "json" null '(("JSON (*.json)" "*.json") ("Any" "*.*"))))
     
-    (define (save-to-path path current-tab)
-      (write-json-graph path (send graph-canvas get-graph))
-      
-      (define new-tab
-        (tab (path-get-filename path) path #t (tab-data current-tab)))
-      (send panel set-tab! (send panel get-selection) new-tab))
+    (define (graph-tab-request-save tab)
+      (define close-result
+        (message-box/custom "Warning"
+                            (format "The File \"~a\" is not saved." (tab-label tab))
+                            "Save" 
+                            "Cancel"
+                            "Don't Save"))
+      (case close-result
+        [(eq? close-result 1) (save-graph-tab)]
+        [(eq? close-result 3) #t]
+        [else #f]))
     
+    (define (graph-tab-request-save-if-required tab)
+      (if (tab-issaved? tab)
+          #t
+          (graph-tab-request-save tab)))
+    
+    ; save/load/close graph-tab
     (define (save-graph-tab [always-ask-path #f])
       (define current-tab (send panel get-current-tab))
 
+      (define (ask-graph-save-path label)
+        (define path
+          (put-file label this #f "graph" "json" null '(("JSON (*.json)" "*.json") ("Any" "*.*"))))
+        (path-replace-extension path #".json"))
+    
       (define path
         (cond [always-ask-path (ask-graph-save-path "Save File As")]
               [else (if (path? (tab-path current-tab))
                         (tab-path current-tab)
                         (ask-graph-save-path "Save File"))]))
       (cond [(path? path)
-             (save-to-path path current-tab)
-             #t]
+             (write-json-graph path (send graph-canvas get-graph))
+      
+             (define new-tab (tab (path-get-filename path) path #t (tab-data current-tab)))
+             (send panel set-tab! (send panel get-selection) new-tab)]
             [else #f]))
 
     (define (load-graph-tab)
       (define path
         (get-file "Open File" this #f #f ".json" null '(("JSON (*.json)" "*.json") ("Any" "*.*"))))
+      
+      ; TODO: check if path is already in tabs:
       (cond [(path? path)
              (send panel add-tab
                    (path-get-filename path)
@@ -394,25 +429,11 @@
              (panel-set-selection (send panel get-selection))]))
 
     (define (close-graph-tab)
-      (define tab (send panel get-current-tab))
-
-      (define can-close?
-        (cond [(tab-issaved? tab) #t]
-              [else
-               (define result
-                 (message-box/custom "Warning"
-                                     (format "The File \"~a\" is not saved." (tab-label tab))
-                                     "Save"
-                                     "Cancel"
-                                     "Don't Save"))
-               (define has-saved?
-                 (if (eq? result 1) (save-graph-tab) #t))
-               
-               (if (or (eq? result 2) (not has-saved?)) #f #t)]))
-      (when can-close?
-        (cond [(eq? (send panel get-number) 1) (exit)]
-              [else (send panel remove-tab (send panel get-selection))])))
+      (when (graph-tab-request-save-if-required (send panel get-current-tab))
+            (send panel remove-tab (send panel get-selection))
+            (when (zero? (send panel get-number)) (close))))
     
+    ; Tab Panel
     (define panel-selection 0)
     
     (define (panel-set-selection id)
@@ -424,10 +445,9 @@
              (send panel set-tab-data! from old-data)
              
              (define new-data (send panel get-tab-data to))
-             (send graph-canvas set-graph! new-data)])
+             (send graph-canvas replace-graph! new-data)])
       (set! panel-selection to))
     
-    ; Tab Panel
     (define panel
       (new graph-tab-canvas%
            [parent this]
@@ -435,7 +455,8 @@
            [callback
             (lambda (panel event)
               (panel-set-selection (send panel get-selection)))]))
-    
+
+    ; Run Algorithms
     (define (run-algorithm)
       (define agol-id (get-pref 'agol-id 0))
       

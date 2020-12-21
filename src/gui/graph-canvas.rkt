@@ -35,6 +35,13 @@
       (super set-graph! new-graph)
       (action-callback graph))
     
+    (define/public (replace-graph! new-graph)
+      (set! copy-nodes '())
+      (set! selections '())
+      (set! selecting? #f)
+      (set! selection-box (list (vec2 0 0) (vec2 0 0)))
+      (super set-graph! new-graph))
+    
     (define/public (set-tool! tool)
       (set! tool-id tool)
       (set! selections '())

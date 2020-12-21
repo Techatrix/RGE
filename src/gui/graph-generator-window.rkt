@@ -2,9 +2,9 @@
 
 (require "../graph/graph.rkt")
 
-(provide open-graph-generate-frame)
+(provide open-graph-generator-window)
 
-(define (open-graph-generate-frame gui)
+(define (open-graph-generator-window gui)
   (define choices (list "Linear" "Star" "Tree" "Random"))
   (define choices-symbols (list 'linear 'star 'tree 'random))
   (define canvas (send gui get-canvas))
@@ -113,6 +113,7 @@
   
   (define frame
     (new frame%
+         [parent gui]
          [label "Generate Graph"]
          [width 500]
          [height 200]
@@ -143,4 +144,5 @@
           (generate))])
   
   (tab-panel-callback tab-panel)
+  (send frame center)
   (send frame show #t))
