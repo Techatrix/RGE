@@ -34,10 +34,10 @@ namespace rge
 			return ids.size();
 		}
 
-		template<SearcherMode SEARCHER_MODE>
+		template<searcher::SearcherMode SEARCHER_MODE>
 		size_t searchEntry(uID id)
 		{
-			return rge::search<SEARCHER_MODE>(ids.begin(), ids.end(), id) - ids.begin();
+			return searcher::search<SEARCHER_MODE>(ids.begin(), ids.end(), id) - ids.begin();
 		}
 
 		void sort()

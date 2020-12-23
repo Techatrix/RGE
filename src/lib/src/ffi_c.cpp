@@ -30,9 +30,9 @@ Graph *graphMake(size_t nodeCount, uID *ids, Vector2 *positions, size_t *connect
 	return graph;
 }
 
-solver::SolveResult *graphSolve(Graph *graph, uID rootNodeID, uID goalNodeID, solver::SolveMode solveMode, SearcherMode searcherMode)
+solver::SolveResult *graphSolve(Graph *graph, uID rootNodeID, uID goalNodeID, solver::SolveMode solveMode, searcher::SearcherMode searcherMode)
 {
-	constexpr int SIZE = solver::SolveModeLength * SearcherModeLength;
+	constexpr int SIZE = solver::SolveModeLength * searcher::SearcherModeLength;
 	int index = solveMode * solver::SolveModeLength + searcherMode;
 	auto result = TemplateGeneratorSwitch<SIZE, solver::GSW, solver::SolveResult, Graph *, uID, uID>::impl(index, graph, rootNodeID, goalNodeID);
 

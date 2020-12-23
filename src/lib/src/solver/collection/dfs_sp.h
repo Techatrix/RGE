@@ -15,7 +15,7 @@ namespace rge::solver
 		std::vector<DiscoElement> disco;
 	};
 
-	template <SearcherMode SEARCHER_MODE>
+	template <searcher::SearcherMode SEARCHER_MODE>
     std::optional<DFSState> graphSolve_DFS_SP_Disco(Graph& graph, uID previousNodeID, uID currentNodeID, uID goalNodeID, std::vector<DiscoElement>& pathState, float distanceFromRootNode)
     {
 		size_t nodeIndex = graph.searchEntry<SEARCHER_MODE>(currentNodeID);
@@ -55,7 +55,7 @@ namespace rge::solver
 		
     }
 
-	template <SearcherMode SEARCHER_MODE>
+	template <searcher::SearcherMode SEARCHER_MODE>
     SolveResult graphSolve_DFS_SP(Graph& graph, uID rootNodeID, uID goalNodeID)
     {
 		std::vector<DiscoElement> disco(graph.size());

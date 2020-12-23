@@ -19,7 +19,7 @@ namespace rge::solver
 		{
 			path.push_back(currentNodeID);
 
-			size_t index = rge::search<BINARY>(graph.ids.begin(), graph.ids.end(), currentNodeID) - graph.ids.begin();
+			size_t index = graph.searchEntry<searcher::BINARY>(currentNodeID);
 
 			currentNodeID = disco[index].get();
 

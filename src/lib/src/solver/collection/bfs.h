@@ -10,7 +10,7 @@
 namespace rge::solver
 {
 
-	template <SearcherMode SEARCHER_MODE>
+	template <searcher::SearcherMode SEARCHER_MODE>
 	SolveResult graphSolve_BFS(Graph &graph, uID rootNodeID, uID goalNodeID)
 	{
 		std::vector<DiscoElement> disco(graph.size());

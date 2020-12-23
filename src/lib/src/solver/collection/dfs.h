@@ -6,7 +6,7 @@
 
 namespace rge::solver
 {
-	template <SearcherMode SEARCHER_MODE>
+	template <searcher::SearcherMode SEARCHER_MODE>
 	bool graphSolve_DFS_Disco(Graph &graph, uID currentNodeID, uID goalNodeID, std::vector<DiscoElement> &disco)
 	{
 		if (currentNodeID == goalNodeID)
@@ -29,7 +29,7 @@ namespace rge::solver
 		return false;
 	}
 
-	template <SearcherMode SEARCHER_MODE>
+	template <searcher::SearcherMode SEARCHER_MODE>
 	SolveResult graphSolve_DFS(Graph &graph, uID rootNodeID, uID goalNodeID)
 	{
 		std::vector<DiscoElement> disco(graph.size());

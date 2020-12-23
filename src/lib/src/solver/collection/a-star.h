@@ -27,7 +27,7 @@ namespace rge::solver
 		};
 	} // namespace
 
-	template <SearcherMode SEARCHER_MODE>
+	template <searcher::SearcherMode SEARCHER_MODE>
 	SolveResult graphSolve_A_STAR(Graph &graph, uID rootNodeID, uID goalNodeID)
 	{
 		MinHeapPriorityQueue<uID> Q;
