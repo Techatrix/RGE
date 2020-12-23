@@ -66,43 +66,44 @@ namespace rge
 				return last;
 			}
 		};
+
+		enum SearcherMode
+		{
+			CONSTANT,
+			LINEAR,
+			LINEAR_SIMD,
+			BINARY,
+			BINARY_FLINEAR,
+			BINARY_SIMD,
+			BINARY_SIMD_FLINEAR
+		};
+
+		static constexpr int SearcherModeLength = 7;
+
+		template <
+			SearcherMode SEARCHER_MODE,
+			class InputIt,
+			typename T,
+			class Compare = std::equal_to<T>>
+		InputIt search(InputIt first, InputIt last, const T &value, Compare c = Compare())
+		{
+			constexpr auto M = SEARCHER_MODE;
+			static_assert(0 <= M && M < SearcherModeLength);
+
+			using constant = searcher::constant_searcher<InputIt, T, Compare>;
+			using linear = searcher::linear_searcher<InputIt, T, Compare>;
+			using binary = searcher::binary_searcher<InputIt, T, Compare>;
+
+			if constexpr (M == CONSTANT)
+				return constant()(first, last, value, c);
+			else if constexpr (M == LINEAR)
+				return linear()(first, last, value, c);
+			else if constexpr (M == BINARY)
+				return binary()(first, last, value, c);
+
+			throw std::runtime_error("Invalid SearcherMode");
+		}
+
 	} // namespace searcher
-
-	enum SearcherMode
-	{
-		CONSTANT,
-		LINEAR,
-		LINEAR_SIMD,
-		BINARY,
-		BINARY_FLINEAR,
-		BINARY_SIMD,
-		BINARY_SIMD_FLINEAR
-	};
-
-	static constexpr int SearcherModeLength = 7;
-
-	template <
-		SearcherMode SEARCHER_MODE,
-		class InputIt,
-		typename T,
-		class Compare = std::equal_to<T>>
-	InputIt search(InputIt first, InputIt last, const T &value, Compare c = Compare())
-	{
-		constexpr auto M = SEARCHER_MODE;
-		static_assert(0 <= M && M < SearcherModeLength);
-
-		using constant = searcher::constant_searcher<InputIt, T, Compare>;
-		using linear = searcher::linear_searcher<InputIt, T, Compare>;
-		using binary = searcher::binary_searcher<InputIt, T, Compare>;
-
-		if constexpr (M == CONSTANT)
-			return constant()(first, last, value, c);
-		else if constexpr (M == LINEAR)
-			return linear()(first, last, value, c);
-		else if constexpr (M == BINARY)
-			return binary()(first, last, value, c);
-
-		throw std::runtime_error("Invalid SearcherMode");
-	}
 
 } // namespace rge

@@ -25,7 +25,8 @@
 #endif
 #endif
 
-#include "ffi.h"
+#include "src/core/graph.h"
+#include "src/solver/solver.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -34,7 +35,7 @@ extern "C"
 
 	DLL_PUBLIC rge::Graph *graphMake(size_t nodeCount, rge::uID *ids, rge::Vector2 *positions, size_t *connectionCounts, rge::Connection **connections);
 
-	DLL_PUBLIC rge::solver::SolveResult *graphSolve(rge::Graph *graph, rge::uID rootNodeID, rge::uID goalNodeID, rge::solver::SolveMode solveMode, rge::SearcherMode searcherMode);
+	DLL_PUBLIC rge::solver::SolveResult *graphSolve(rge::Graph *graph, rge::uID rootNodeID, rge::uID goalNodeID, rge::solver::SolveMode solveMode, rge::searcher::SearcherMode searcherMode);
 
 	DLL_PUBLIC int graphSolveResultResponse(rge::solver::SolveResult *result);
 

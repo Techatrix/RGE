@@ -8,7 +8,7 @@
 
 namespace rge::solver
 {
-	template <SolveMode SOLVE_MODE, SearcherMode SEARCHER_MODE>
+	template <SolveMode SOLVE_MODE, searcher::SearcherMode SEARCHER_MODE>
 	SolveResult solve(Graph *graph, uID rootNodeID, uID goalNodeID);
 
 	template <typename T, int N>
@@ -17,17 +17,17 @@ namespace rge::solver
 		T operator()(Graph *graph, uID rootNodeID, uID goalNodeID) const
 		{
 			constexpr SolveMode solveMode = (SolveMode)(N / SolveModeLength);
-			constexpr SearcherMode searcherMode = (SearcherMode)(N % SolveModeLength);
+			constexpr searcher::SearcherMode searcherMode = (searcher::SearcherMode)(N % SolveModeLength);
 			return solve<solveMode, searcherMode>(graph, rootNodeID, goalNodeID);
 		}
 	};
 
-	template <SolveMode SOLVE_MODE, SearcherMode SEARCHER_MODE>
+	template <SolveMode SOLVE_MODE, searcher::SearcherMode SEARCHER_MODE>
 	SolveResult solve(Graph *graph, uID rootNodeID, uID goalNodeID)
 	{
-		if(!(0 <= SEARCHER_MODE && SEARCHER_MODE < SearcherModeLength))
+		if(!(0 <= SEARCHER_MODE && SEARCHER_MODE < searcher::SearcherModeLength))
 			return SolveResult{INVALID_SEARCHER_MODE};
-		if( SEARCHER_MODE == CONSTANT && !graph->hasLinearIDs())
+		if( SEARCHER_MODE == searcher::CONSTANT && !graph->hasLinearIDs())
 			return SolveResult{INVALID_SEARCHER_MODE};
 		if(!(graph->searchEntry<SEARCHER_MODE>(rootNodeID) < graph->size()))
 			return SolveResult{INVALID_ROOT};

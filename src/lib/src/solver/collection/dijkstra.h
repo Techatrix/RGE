@@ -24,7 +24,7 @@ namespace rge::solver
 		};
 	} // namespace
 
-	template <SearcherMode SEARCHER_MODE>
+	template <searcher::SearcherMode SEARCHER_MODE>
 	SolveResult graphSolve_DIJKSTRA(Graph &graph, uID rootNodeID, uID goalNodeID)
 	{
 		IndexedMinHeapPriorityQueue<uID> Q;

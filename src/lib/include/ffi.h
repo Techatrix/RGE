@@ -7,6 +7,12 @@
 
 void generateNode(rge::Graph &graph, size_t degree, size_t depth);
 
-std::unique_ptr<rge::Graph> generateGraph(size_t degree, size_t depth);
+std::unique_ptr<rge::Graph> generateStarGraph(size_t degree, size_t depth);
 
-std::unique_ptr<rge::Graph> generateRandomGraph(size_t nodeCount, float radius, size_t connectionsPerNode = 100);
+std::unique_ptr<rge::Graph> generateGridGraph(size_t width, size_t height, float distance);
+
+std::unique_ptr<rge::Graph> generateGridGraphFromGrid(std::vector<std::vector<bool>>& grid, float distance);
+
+std::unique_ptr<rge::Graph> generateHierarchicalGraph(size_t depth);
+
+std::unique_ptr<rge::Graph> generateRandomGraph(size_t nodeCount);
