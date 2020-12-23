@@ -238,7 +238,39 @@
         (lambda (a b) (model-menu-item-callback 0))
         (lambda (a b) (model-menu-item-callback 1))
         (lambda (a b) (model-menu-item-callback 2))
-        (lambda (a b) (model-menu-item-callback 3)))))
+        (lambda (a b)
+          (cond [ffi:is-available (model-menu-item-callback 3)]
+                [else
+                 (define result
+                   (message-box/custom "Warning"
+                                       (format "Foreign Library File not found or invalid!")
+                                       "Select File"
+                                       "Cancel"
+                                       #f))
+                 (when (eq? result 1)
+                       (define suffix (system-type 'so-suffix))
+
+                       (define filters
+                         (list
+                          (list (format "FFI File (*~a)" suffix) (format "*~a" suffix))
+                          (list "Any" "*.*")))
+                       
+                       (define path
+                         (get-file "Select Foreign Library File" this #f #f #f null filters))
+                       
+                       (when (path? path)
+                             (displayln path)
+                             (put-preferences (list 'ffi-lib-path)
+                                              (list (path->string path))
+                                              #f
+                                              (build-path (find-system-path 'pref-dir) "rge-prefs.rktd"))
+                             (define answer
+                               (message-box "Requesting Restart"
+                                            "To use FFi, a restart is required\n Quit now?"
+                                            this
+                                            (list 'yes-no)))
+                             (when (eq? answer 'yes)
+                                   (exit))))])))))
     
     (define menu-4-1
       (new menu%
