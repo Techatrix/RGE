@@ -15,7 +15,7 @@ namespace rge::solver
 
 		uID currentNodeID = goalNodeID;
 
-		while (rootNodeID != currentNodeID)
+		while (currentNodeID != rootNodeID)
 		{
 			path.push_back(currentNodeID);
 
@@ -23,8 +23,7 @@ namespace rge::solver
 
 			currentNodeID = disco[index].get();
 
-			if (currentNodeID < 0)
-				return std::vector<uID>();
+			assert(currentNodeID >= 0);
 		}
 
 		path.push_back(rootNodeID);

@@ -147,7 +147,7 @@
       "Draw Axis" "Draw Grid" "Draw Node ID" "Draw Node Weight")
      (list #f #f #t #f #t #t #f #t #f)
      (list #f #f #f #f
-      (list (get-pref 'dark-mode #f))
+      (list (get-pref 'dark-mode #t))
       (list (get-pref 'draw-axis #f))
       (list (get-pref 'draw-grid #t))
       (list (get-pref 'draw-node-id #f))
@@ -225,19 +225,19 @@
     (define model-menu-items
       (build-menu-items
        menu-4-0
-       (list "Racket" "Racket Optimized" "Racket Typed" "FFI")
-       (list #f #f #f #f)
+       (list "Racket" "Racket Optimized" #|"Racket Typed"|# "FFI")
+       (list #f #f #f)
        (list
         (list (eq? (get-pref 'model-id 0) 0))
         (list (eq? (get-pref 'model-id 0) 1))
-        (list (eq? (get-pref 'model-id 0) 2))
+        ; (list (eq? (get-pref 'model-id 0) 2))
         (list (eq? (get-pref 'model-id 0) 3))) 
-       (list #f #f #f #f)
-       (list #f #f #f #f)
+       (list #f #f #f)
+       (list #f #f #f)
        (list
         (lambda (a b) (model-menu-item-callback 0))
         (lambda (a b) (model-menu-item-callback 1))
-        (lambda (a b) (model-menu-item-callback 2))
+        ; (lambda (a b) (model-menu-item-callback 2))
         (lambda (a b)
           (cond [ffi:is-available (model-menu-item-callback 3)]
                 [else
@@ -450,15 +450,27 @@
     (define (load-graph-tab)
       (define path
         (get-file "Open File" this #f #f ".json" null '(("JSON (*.json)" "*.json") ("Any" "*.*"))))
-      
-      ; TODO: check if path is already in tabs:
-      (cond [(path? path)
-             (send panel add-tab
-                   (path-get-filename path)
-                   path
-                   #t
-                   (read-json-graph path))
-             (panel-set-selection (send panel get-selection))]))
+
+      (when (path? path)
+            (define (get-same-path i)
+              (if (equal? path (tab-path (send panel get-tab i)))
+                  i
+                  (if (zero? i) #f (get-same-path (- i 1)))))
+        
+            (define tab-count (send panel get-number))
+            (define same-path
+              (if (zero? tab-count)
+                  #f
+                  (get-same-path (- tab-count 1))))
+            
+            (cond [(integer? same-path) (send panel set-selection same-path)]
+                  [else
+                   (send panel add-tab
+                         (path-get-filename path)
+                         path
+                         #t
+                         (read-json-graph path))
+                   (panel-set-selection (send panel get-selection))])))
 
     (define (close-graph-tab)
       (when (graph-tab-request-save-if-required (send panel get-current-tab))
@@ -521,7 +533,7 @@
     (define graph-canvas
       (new graph-canvas%
            [parent panel]
-           [dark-mode? (get-pref 'dark-mode #f)]
+           [dark-mode? (get-pref 'dark-mode #t)]
            [draw-axis? (get-pref 'draw-axis #f)]
            [draw-grid? (get-pref 'draw-grid #t)]
            [draw-node-ids? (get-pref 'draw-node-id #f)]
