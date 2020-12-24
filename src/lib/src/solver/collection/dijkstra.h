@@ -57,7 +57,7 @@ namespace rge::solver
 					if (alt < set[vIndex].distance)
 					{
 						set[vIndex].distance = alt;
-						set[vIndex].previous = uIndex;
+						set[vIndex].previous = u;
 
 						Q.decreaseKey(v.id, alt);
 					}
@@ -65,6 +65,7 @@ namespace rge::solver
 			}
 		}
 
+		//return SolveResult{SUCCESS, discoParse(graph, std::move(set), rootNodeID, goalNodeID)};
 		return SolveResult{NO_PATH};
 	}
 } // namespace rge::solver

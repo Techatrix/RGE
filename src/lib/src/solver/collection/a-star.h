@@ -71,7 +71,7 @@ namespace rge::solver
 				{
 					set[vIndex].gscore = tentative_gScore;
 					set[vIndex].fscore = tentative_gScore + h(vIndex);
-					set[vIndex].previous = uIndex;
+					set[vIndex].previous = u;
 
 					Q.insert(v.id, set[vIndex].fscore);
 				}
