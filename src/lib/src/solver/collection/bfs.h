@@ -39,7 +39,7 @@ namespace rge::solver
 				if (!disco[connectionIndex].found)
 				{
 					disco[connectionIndex] = DiscoElement{currentNodeID, true};
-					Q.push_back(connectionIndex);
+					Q.push_back(connection.id);
 				}
 			}
 		}

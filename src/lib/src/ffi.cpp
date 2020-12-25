@@ -3,8 +3,10 @@
 #ifndef M_PI
 #define M_PI (3.14159265358979323846)
 #endif
+
 #include <cmath>
 #include <random>
+#include <algorithm>
 
 using namespace rge;
 
@@ -104,10 +106,10 @@ std::unique_ptr<rge::Graph> generateGridGraphFromGrid(std::vector<std::vector<bo
 		{
 			if(grid[y][x])
 			{
-				graph.ids.push_back(i);
+				graph.ids.push_back(i++);
 				graph.positions.push_back({x * distance, y * distance});
 				
-				auto c = graph.connections.emplace_back();
+				std::vector<Connection> c;
 				if (x != 0 && grid[y][x-1]) // Left
 					c.push_back({(uID)(y * width + (x - 1)), distance});
 				if (x != (width - 1) && grid[y][x+1]) // Right
@@ -116,8 +118,7 @@ std::unique_ptr<rge::Graph> generateGridGraphFromGrid(std::vector<std::vector<bo
 					c.push_back({(uID)((y - 1) * width + x), distance});
 				if (y != (height - 1) && grid[y+1][x]) // Down
 					c.push_back({(uID)((y + 1) * width + x), distance});
-				
-				i++;
+				graph.connections.push_back(std::move(c));
 			}
 		}
 

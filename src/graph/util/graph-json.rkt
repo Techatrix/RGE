@@ -64,8 +64,8 @@
 
 (define (jsexpr->graph hash)
   (graph (jsexpr->nodes (hash-ref hash 'nodes))
-         (hash-ref hash 'root-node-id)
-         (hash-ref hash 'goal-node-id)))
+         (hash-ref hash 'root-node-id (lambda () #f))
+         (hash-ref hash 'goal-node-id (lambda () #f))))
 
 
 (define (read-json-graph path)

@@ -28,3 +28,5 @@
 (define (vec2-rotate v a) (vec2 (- (* (vec2-x v) (cos a)) (* (vec2-y v) (sin a)))
                                 (+ (* (vec2-x v) (sin a)) (* (vec2-y v) (cos a)))))
 
+(define (vec2-sum v) (+ (vec2-x v) (vec2-y v)))
+(define (vec2-pow2 v) (vec2-mult v v))

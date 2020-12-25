@@ -62,14 +62,16 @@
               (draw-node-connections graph origin (rest connections) canvas-dc draw-weights?)]))
 
 (define (draw-connection graph origin connection canvas-dc draw-weights?)
-  (define target (node-position (graph-search-node-by-id graph (connection-id connection))))
-  (draw-arrow canvas-dc origin target)
-  (when draw-weights?
-    (define text (number->string (connection-weight connection)))
-    (define text-pos (get-weight-position origin target 15))
-    (define-values (w h a b) (send canvas-dc get-text-extent text))
-    (define centered-text-pos (vec2-sub text-pos (vec2-scalar (vec2 w h) 0.5)))
-    (send canvas-dc draw-text text (vec2-x centered-text-pos) (vec2-y centered-text-pos))))
+  (define target (graph-search-node-by-id graph (connection-id connection)))
+  (when (node? target)
+        (define target-pos (node-position target))
+        (draw-arrow canvas-dc origin target-pos)
+        (when draw-weights?
+              (define text (number->string (connection-weight connection)))
+              (define text-pos (get-weight-position origin target-pos 15))
+              (define-values (w h a b) (send canvas-dc get-text-extent text))
+              (define centered-text-pos (vec2-sub text-pos (vec2-scalar (vec2 w h) 0.5)))
+              (send canvas-dc draw-text text (vec2-x centered-text-pos) (vec2-y centered-text-pos)))))
 
 
 (define (get-weight-position pos1 pos2 m)

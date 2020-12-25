@@ -19,7 +19,7 @@
 (define graph-tab-canvas%
   (class tab-panel%
     (super-new)
-    (init-field [tabs (list (tab "untitled" #f #f #f) )])
+    (init-field [tabs (list (tab "untitled" #f #t #f) )])
 
     (inherit delete
              get-number
