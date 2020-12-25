@@ -14,13 +14,11 @@
   (/ (round (* 10 x)) 10))
 
 (define (vec2->jsexpr vec2)
-  (hasheq 'x (round-decimal-1 (/ (vec2-x vec2) node-size))
-          'y (round-decimal-1 (/ (vec2-y vec2) node-size))))
+  (list (round-decimal-1 (/ (vec2-x vec2) node-size))
+        (round-decimal-1 (/ (vec2-y vec2) node-size))))
 
 (define (connection->jsexpr connection)
-  (hasheq 'id (connection-id connection)
-          'weight (connection-weight connection)))
-
+  (list (connection-id connection) (connection-weight connection)))
 
 (define (connections->jsexpr connections)
   (cond [(empty? connections) '()]
@@ -44,13 +42,10 @@
 
 
 (define (jsexpr->vec2 hash)
-  (vec2 (* (hash-ref hash 'x) node-size)
-        (* (hash-ref hash 'y) node-size)))
+  (vec2 (* (car hash) node-size) (* (cadr hash) node-size)))
 
 (define (jsexpr->connection hash)
-  (connection (hash-ref hash 'id)
-              (hash-ref hash 'weight)))
-
+  (connection (car hash) (cadr hash)))
 
 (define (jsexpr->connections lst)
   (cond [(empty? lst) '()]
