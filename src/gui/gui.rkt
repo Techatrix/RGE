@@ -433,7 +433,7 @@
       (define (ask-graph-save-path label)
         (define path
           (put-file label this #f "graph" "json" null '(("JSON (*.json)" "*.json") ("Any" "*.*"))))
-        (path-replace-extension path #".json"))
+        (if (path? path) (path-replace-extension path #".json") #f))
     
       (define path
         (cond [always-ask-path (ask-graph-save-path "Save File As")]
