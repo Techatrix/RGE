@@ -3,10 +3,7 @@
 (require "util.rkt")
 (require "structures.rkt")
 
-(provide apply-transform)
-(provide draw-point)
-(provide draw-line)
-(provide draw-arrow)
+(provide (all-defined-out))
 
 (define (apply-transform dc pos)
   (define t (send dc get-initial-matrix))

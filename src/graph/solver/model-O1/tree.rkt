@@ -1,13 +1,7 @@
 #lang racket
 
 (provide (struct-out tree-node)
-         tree-node-insert-value
-         tree-node-remove-value
-         tree-node-replace-value
-         tree-node-search
-         tree-node-search-min
-         tree-node-map
-         tree-node->list)
+         (all-defined-out))
 
 (struct tree-node (left right value) #:transparent)
 

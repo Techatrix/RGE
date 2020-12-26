@@ -3,10 +3,9 @@
 (require "structures.rkt")
 (require "geometry.rkt")
 
-(provide (all-from-out "structures.rkt")
+(provide (all-defined-out)
+         (all-from-out "structures.rkt")
          (all-from-out "geometry.rkt"))
-
-(provide (all-defined-out))
 
 (define (number-wrap min-n max-n number)
   (cond [(< number min-n)

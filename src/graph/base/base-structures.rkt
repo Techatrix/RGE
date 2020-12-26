@@ -2,8 +2,8 @@
 
 (require "../../util/structures.rkt")
 
-(provide (all-defined-out))
-(provide (all-from-out "../../util/structures.rkt"))
+(provide (all-defined-out)
+         (all-from-out "../../util/structures.rkt"))
 
 (struct connection (id weight) #:transparent)
 

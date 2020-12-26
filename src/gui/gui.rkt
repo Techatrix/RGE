@@ -238,8 +238,11 @@
         (lambda (a b) (model-menu-item-callback 0))
         (lambda (a b) (model-menu-item-callback 1))
         ; (lambda (a b) (model-menu-item-callback 2))
-        (lambda (a b)
-          (cond [ffi:is-available (model-menu-item-callback 3)]
+        (lambda (item b)
+          (cond [ffi:is-available
+                 (model-menu-item-callback 3)
+                 (put-pref 'model-id 3)
+                 (send item check #t)]
                 [else
                  (define result
                    (message-box/custom "Warning"
