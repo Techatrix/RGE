@@ -12,7 +12,7 @@
 ; Breadth-first search
 (define (bfs graph searcher state-searcher root-node-id goal-node-id)
   (define state
-    (graph-state-disco-node-discover
+    (graph-state-disco-set-node-discover-id
      (graph-state-disco-build graph searcher state-searcher) root-node-id root-node-id))
 
   (define-values (new-state found)
@@ -35,13 +35,11 @@
                        (bfs-explore-connections connections dequeueed-queue state node-id))
                      (bfs-call graph searcher new-queue new-state goal-node-id)])]))
 
-(define (bfs-explore-connections connections queue state node-id)    
+(define (bfs-explore-connections connections queue state node-id)
   (cond [(empty? connections) (values queue state)]
-        [(cadr (node-state-data (graph-state-get-node
-                                 state
-                                 (connection-id (car connections)))))
-         (bfs-explore-connections (rest connections) queue state node-id)]
-        [else (define con-id (connection-id (car connections)))
-              (define new_queue (queue-enqueue queue con-id))
-              (define new_state (graph-state-disco-node-discover state con-id node-id))
-              (bfs-explore-connections (rest connections) new_queue new_state node-id)]))
+        [(not (graph-state-disco-get-node-discover-id state (connection-id (car connections))))
+         (define con-id (connection-id (car connections)))
+         (define new_queue (queue-enqueue queue con-id))
+         (define new_state (graph-state-disco-set-node-discover-id state con-id node-id))
+         (bfs-explore-connections (rest connections) new_queue new_state node-id)]
+        [else (bfs-explore-connections (rest connections) queue state node-id)]))
