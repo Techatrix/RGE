@@ -1,7 +1,6 @@
 #lang racket
 
 (require "../../base/base-structures.rkt")
-(require "../../../util/util.rkt")
 (require "../util/graph-searcher.rkt")
 (require "../util/graph-state.rkt")
 

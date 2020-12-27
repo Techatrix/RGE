@@ -42,8 +42,8 @@
       
       (define tab-count (send panel get-number))
       (if (< 0 tab-count)
-            (proc (- tab-count 1))
-            #t))
+          (proc (- tab-count 1))
+          #t))
     
     (define/public (get-canvas) graph-canvas)
     
@@ -112,27 +112,30 @@
            [label "&Edit"]))
 
     
-    (build-menu-items
-     menu-2
-     (list "Undo" "Redo" "Cut" "Copy" "Paste" "Add Node" "Delete Node" "Select All" "Clear All")
-     (list #f #f #t #f #f #t #f #t #f)
-     (list #f #f #f #f #f #f #f #f #f)
-     (list #\Z #\Z #\X #\C #\V #\B #\B #\A #\A)
-     (list #f (list 'shift 'ctl) #f #f #f #f (list 'shift 'ctl) #f (list 'shift 'ctl))
-     (list
-      (lambda (a b) (displayln "Undo"))
-      (lambda (a b) (displayln "Redo"))
-      (lambda (a b) (send graph-canvas action-cut))
-      (lambda (a b) (send graph-canvas action-copy))
-      (lambda (a b) (send graph-canvas action-paste))
-      (lambda (a b) (send graph-canvas set-tool! 'add-node))
-      (lambda (a b) (send graph-canvas set-tool! 'delete-node))
-      (lambda (a b)
-        (define nodes (graph-nodes (send graph-canvas get-graph)))
-        (send graph-canvas set-selections! (map node-id nodes)))
-      (lambda (a b)
-        (cond [(eq? (message-box "Confirm" "Are you sure?" this (list 'yes-no 'no-icon)) 'yes)
-               (send graph-canvas action-reset)]))))
+    (define items
+      (build-menu-items
+       menu-2
+       (list "Undo" "Redo" "Cut" "Copy" "Paste" "Add Node" "Delete Node" "Select All" "Clear All")
+       (list #f #f #t #f #f #t #f #t #f)
+       (list #f #f #f #f #f #f #f #f #f)
+       (list #\Z #\Z #\X #\C #\V #\B #\B #\A #\A)
+       (list #f (list 'shift 'ctl) #f #f #f #f (list 'shift 'ctl) #f (list 'shift 'ctl))
+       (list
+        (lambda (a b) #f) ; TODO: undo
+        (lambda (a b) #f) ; TODO: redo
+        (lambda (a b) (send graph-canvas action-cut))
+        (lambda (a b) (send graph-canvas action-copy))
+        (lambda (a b) (send graph-canvas action-paste))
+        (lambda (a b) (send graph-canvas set-tool! 'add-node))
+        (lambda (a b) (send graph-canvas set-tool! 'delete-node))
+        (lambda (a b)
+          (define nodes (graph-nodes (send graph-canvas get-graph)))
+          (send graph-canvas set-selections! (map node-id nodes)))
+        (lambda (a b)
+          (cond [(eq? (message-box "Confirm" "Are you sure?" this (list 'yes-no 'no-icon)) 'yes)
+                 (send graph-canvas action-reset)])))))
+    (send (car items) enable #f)
+    (send (cadr items) enable #f)
     
     ; View Menu
     (define menu-3
@@ -147,11 +150,11 @@
       "Draw Axis" "Draw Grid" "Draw Node ID" "Draw Node Weight")
      (list #f #f #t #f #t #t #f #t #f)
      (list #f #f #f #f
-      (list (get-pref 'dark-mode #t))
-      (list (get-pref 'draw-axis #f))
-      (list (get-pref 'draw-grid #t))
-      (list (get-pref 'draw-node-id #f))
-      (list (get-pref 'draw-node-weight #t))) 
+           (list (get-pref 'dark-mode #t))
+           (list (get-pref 'draw-axis #f))
+           (list (get-pref 'draw-grid #t))
+           (list (get-pref 'draw-node-id #f))
+           (list (get-pref 'draw-node-weight #t))) 
      (list 'add 'subtract #f #f #f #f #f #f #f)
      (list #f #f #f #f #f #f #f #f #f)
      (list
@@ -251,29 +254,29 @@
                                        "Cancel"
                                        #f))
                  (when (eq? result 1)
-                       (define suffix (system-type 'so-suffix))
+                   (define suffix (system-type 'so-suffix))
 
-                       (define filters
-                         (list
-                          (list (format "FFI File (*~a)" suffix) (format "*~a" suffix))
-                          (list "Any" "*.*")))
+                   (define filters
+                     (list
+                      (list (format "FFI File (*~a)" suffix) (format "*~a" suffix))
+                      (list "Any" "*.*")))
                        
-                       (define path
-                         (get-file "Select Foreign Library File" this #f #f #f null filters))
+                   (define path
+                     (get-file "Select Foreign Library File" this #f #f #f null filters))
                        
-                       (when (path? path)
-                             (displayln path)
-                             (put-preferences (list 'ffi-lib-path)
-                                              (list (path->string path))
-                                              #f
-                                              (build-path (find-system-path 'pref-dir) "rge-prefs.rktd"))
-                             (define answer
-                               (message-box "Requesting Restart"
-                                            "To use FFi, a restart is required\n Quit now?"
-                                            this
-                                            (list 'yes-no)))
-                             (when (eq? answer 'yes)
-                                   (exit))))])))))
+                   (when (path? path)
+                     (displayln path)
+                     (put-preferences (list 'ffi-lib-path)
+                                      (list (path->string path))
+                                      #f
+                                      (build-path (find-system-path 'pref-dir) "rge-prefs.rktd"))
+                     (define answer
+                       (message-box "Requesting Restart"
+                                    "To use FFi, a restart is required\n Quit now?"
+                                    this
+                                    (list 'yes-no)))
+                     (when (eq? answer 'yes)
+                       (exit))))])))))
     
     (define menu-4-1
       (new menu%
@@ -455,30 +458,30 @@
         (get-file "Open File" this #f #f ".json" null '(("JSON (*.json)" "*.json") ("Any" "*.*"))))
 
       (when (path? path)
-            (define (get-same-path i)
-              (if (equal? path (tab-path (send panel get-tab i)))
-                  i
-                  (if (zero? i) #f (get-same-path (- i 1)))))
+        (define (get-same-path i)
+          (if (equal? path (tab-path (send panel get-tab i)))
+              i
+              (if (zero? i) #f (get-same-path (- i 1)))))
         
-            (define tab-count (send panel get-number))
-            (define same-path
-              (if (zero? tab-count)
-                  #f
-                  (get-same-path (- tab-count 1))))
+        (define tab-count (send panel get-number))
+        (define same-path
+          (if (zero? tab-count)
+              #f
+              (get-same-path (- tab-count 1))))
             
-            (cond [(integer? same-path) (send panel set-selection same-path)]
-                  [else
-                   (send panel add-tab
-                         (path-get-filename path)
-                         path
-                         #t
-                         (read-json-graph path))
-                   (panel-set-selection (send panel get-selection))])))
+        (cond [(integer? same-path) (send panel set-selection same-path)]
+              [else
+               (send panel add-tab
+                     (path-get-filename path)
+                     path
+                     #t
+                     (read-json-graph path))
+               (panel-set-selection (send panel get-selection))])))
 
     (define (close-graph-tab)
       (when (graph-tab-request-save-if-required (send panel get-current-tab))
-            (send panel remove-tab (send panel get-selection))
-            (when (zero? (send panel get-number)) (close))))
+        (send panel remove-tab (send panel get-selection))
+        (when (zero? (send panel get-number)) (close))))
     
     ; Tab Panel
     (define panel-selection 0)

@@ -8,21 +8,24 @@
 
 (define (graph-state-disco-build graph searcher state-searcher)
   (graph-state
-   ((searcher-map searcher) (graph-nodes graph)
-     (lambda (node)
-       (node-state (node-id node) (list #f))))
+   ((searcher-map searcher)
+    (graph-nodes graph)
+    (lambda (node)
+      (node-state (node-id node) (list #f))))
    state-searcher))
 
 (define (graph-state-dijkstra-build graph searcher state-searcher)
   (graph-state
-   ((searcher-map searcher) (graph-nodes graph)
-     (lambda (node)
-       (node-state (node-id node) (list #f +inf.0))))
+   ((searcher-map searcher)
+    (graph-nodes graph)
+    (lambda (node)
+      (node-state (node-id node) (list #f +inf.0))))
    state-searcher))
 
 (define (graph-state-a-star-build graph searcher state-searcher)
   (graph-state
-   ((searcher-map searcher) (graph-nodes graph)
-     (lambda (node)
-       (node-state (node-id node) (list #f +inf.0 +inf.0))))
+   ((searcher-map searcher)
+    (graph-nodes graph)
+    (lambda (node)
+      (node-state (node-id node) (list #f +inf.0 +inf.0))))
    state-searcher))

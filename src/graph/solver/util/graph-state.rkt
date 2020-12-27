@@ -1,8 +1,6 @@
 #lang racket
 
 (require "graph-searcher.rkt")
-(require "../../../util/util.rkt")
-(require "../../base/base-structures.rkt")
 
 (provide (struct-out node-state)
          (struct-out graph-state)
