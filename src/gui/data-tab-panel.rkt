@@ -81,5 +81,8 @@
                (update-tab (car tabs) i)
                (proc (rest tabs) (+ i 1))]))
       (proc tabs 0))
+
+    (define/public (update)
+      (update-tabs))
     
-    (update-tabs)))
+    (update)))

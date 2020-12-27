@@ -17,7 +17,8 @@
                 [draw-grid? #t]
                 [draw-node-ids? #f]
                 [draw-node-weights? #t])
-    
+                
+    (inherit refresh)
     (inherit-field graph)
     (inherit-from-graph-base-canvas)
     
@@ -46,27 +47,27 @@
       (set! tool-id tool)
       (set! selections '())
       (set! selecting? #f)
-      (send this refresh))
+      (refresh))
 
     (define/public (set-selections! new-selections)
       (action-tool-select)
       (set! selections new-selections)
-      (send this refresh))
+      (refresh))
 
     (define/public (set-root-node-id! new-root-node-id)
       (set-graph-root-node-id! graph new-root-node-id)
-      (send this refresh))
+      (refresh))
     (define/public (set-goal-node-id! new-goal-node-id)
       (set-graph-goal-node-id! graph new-goal-node-id)
-      (send this refresh))
+      (refresh))
 
     (define/public (set-draw-axis?! _draw-axis)
       (set! draw-axis? _draw-axis)
-      (send this refresh))
+      (refresh))
 
     (define/public (set-draw-grid?! _draw-grid)
       (set! draw-grid? _draw-grid)
-      (send this refresh))
+      (refresh))
 
     (define/public (set-dark-mode?! _dark-mode?)
       (set! dark-mode? _dark-mode?)
@@ -74,15 +75,15 @@
               (if _dark-mode?
                   (make-object color% 25 25 25)
                   (make-object color% 225 225 225)))
-      (send this refresh))
+      (refresh))
     
     (define/public (set-draw-node-ids?! _draw-node-ids?)
       (set! draw-node-ids? _draw-node-ids?)
-      (send this refresh))
+      (refresh))
 
     (define/public (set-draw-node-weights?! _draw-node-weights?)
       (set! draw-node-weights? _draw-node-weights?)
-      (send this refresh))
+      (refresh))
     
     ; Mouse position
     (define/private (get-mouse-pos-view)
@@ -284,8 +285,8 @@
       (define type (send event get-event-type))
 
       (case type
-        [(enter) (set! active #t) (send this refresh)]
-        [(leave) (set! active #f) (send this refresh)])
+        [(enter) (set! active #t) (refresh)]
+        [(leave) (set! active #f) (refresh)])
 
       (when active
         (set! p-mouse-pos mouse-pos)
@@ -299,9 +300,9 @@
               (when (send event get-left-down)
                 (cond [selecting?
                        (set! selection-box (list (car selection-box) mouse-pos-view))
-                       (send this refresh)]
+                       (refresh)]
                       [else (base-move-nodes selections delta-mouse-pos)]))]
-             [(add-node) (send this refresh)])
+             [(add-node) (refresh)])
            (when (send event get-middle-down)
              (define delta (vec2-div delta-mouse-pos (send this get-scale)))
              (send this translate (vec2-x delta) (vec2-y delta)))]
@@ -347,7 +348,7 @@
                      new-selections)))
           
               (set! selecting? #f)
-              (send this refresh)]
+              (refresh)]
              [(add-node) (action-add-node)]
              [(delete-node) (action-delete-node)])]
           [(right-down)

@@ -9,6 +9,8 @@
   (class canvas%
     (super-new)
     
+    (inherit refresh)
+
     (define/public (get-translation)
       (define transform (send (send this get-dc) get-initial-matrix))
       (vec2 (vector-ref transform 4) (vector-ref transform 5)))
@@ -25,7 +27,7 @@
                 (vector-ref m 2)
                 (vector-ref m 3) dx dy))
       (send (send this get-dc) set-initial-matrix new-m)
-      (send this refresh))
+      (refresh))
 
     (define/public (set-scale x-scale y-scale)
       (define m (send (send this get-dc) get-initial-matrix))
@@ -37,15 +39,15 @@
                 (vector-ref m 4)
                 (vector-ref m 5)))
       (send (send this get-dc) set-initial-matrix new-m)
-      (send this refresh))
+      (refresh))
     
     (define/public (translate dx dy)
       (send (send this get-dc) transform (vector 1 0 0 1 dx dy))
-      (send this refresh))
+      (refresh))
 
     (define/public (scale x-scale y-scale)
       (send (send this get-dc) transform (vector x-scale 0 0 y-scale 0 0))
-      (send this refresh))
+      (refresh))
 
     (define/public (zoom pos delta)
       (define mx (vec2-x pos))

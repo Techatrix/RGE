@@ -9,7 +9,7 @@
 
 namespace rge
 {
-	typedef long int uID;
+	typedef int64_t uID;
 
 	struct Vector2
 	{

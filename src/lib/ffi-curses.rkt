@@ -28,8 +28,7 @@
 (define-ffi-definer define-curses lib #:default-make-fail make-not-available)
 
 
-(define _uID _long)
-(define _size_t _ulong)
+(define _uID _int64)
 
 (define _Graph-pointer (_cpointer 'Graph))
 (define _SolveResult-pointer (_cpointer 'SolveResult))
@@ -39,15 +38,14 @@
 
 (define-curses graphMake
   (_fun
-   [_int = (if (= (length ids)
+   [_size = (if (= (length ids)
                   (length positions)
-                  (length connectionCounts)
-                  (length connections))
+                  (length connectionCounts))
                (length ids)
                (error "Invalid Graph"))]
    [ids : (_list i _uID)]
    [positions : (_list i _Vector2)]
-   [connectionCounts : (_list i _size_t)]
+   [connectionCounts : (_list i _size)]
    [connections : (_list i (_list i _Connection))]
    -> _Graph-pointer))
 
@@ -68,7 +66,7 @@
 (define-curses graphSolveResultPathSize
   (_fun
    [result : _SolveResult-pointer]
-   -> _size_t))
+   -> _size))
 
 (define-curses graphSolveResultPath
   (_fun

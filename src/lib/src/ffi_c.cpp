@@ -18,9 +18,8 @@ Graph *graphMake(size_t nodeCount, uID *ids, Vector2 *positions, size_t *connect
 		graph->ids[i] = ids[i];
 		graph->positions[i] = positions[i];
 
-		std::vector<Connection> c(connectionCounts[i]);
-		std::copy(connections[i], connections[i] + connectionCounts[i], c.begin());
-		graph->connections[i] = std::move(c);
+		for (size_t j = 0; j < connectionCounts[i]; j++)
+			graph->connections[i].push_back(connections[i][j]);
 	}
 
 	if(!std::is_sorted(graph->ids.begin(), graph->ids.end()))

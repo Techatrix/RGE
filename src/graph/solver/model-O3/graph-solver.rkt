@@ -36,5 +36,5 @@
 (define (dijkstra graph root-node-id goal-node-id)
   (solve-result->route (ffi:graphSolve graph root-node-id goal-node-id 3 3)))
 
-(define (a-star graph root-node-id goal-node-id)
+(define (a-star graph root-node-id goal-node-id [proc-dist void])
   (solve-result->route (ffi:graphSolve graph root-node-id goal-node-id 4 3)))
