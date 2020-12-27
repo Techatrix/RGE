@@ -11,11 +11,13 @@
   (class view-canvas%
     (init-field [graph (graph-make)])
     
+    (inherit refresh)
+
     (define/public (get-graph) graph)
     
     (define/public (set-graph! new-graph)
       (set! graph (if (graph? new-graph) new-graph (graph-make)))
-      (send this refresh))
+      (refresh))
     ; single
     (define/public (base-add-node-proc proc position)
       (base-add-nodes-proc proc #:positions (list position)))

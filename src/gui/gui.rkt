@@ -544,9 +544,7 @@
            [action-callback
             (lambda (_)
               (define current-tab (send panel get-current-tab))
-              (send panel set-current-tab!
-                    (tab (tab-label current-tab)
-                         (tab-path current-tab)
-                         #f
-                         (tab-data current-tab))))]
+              (when (tab-issaved? current-tab)
+                (set-tab-issaved?! current-tab #f)
+                (send panel update)))]
            [style (list 'no-focus )]))))
