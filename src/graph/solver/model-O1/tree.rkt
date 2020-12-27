@@ -16,16 +16,16 @@
              (if (tree-node? left) ; lower bound
                  ;  recursive add node to left
                  (tree-node (tree-node-insert-value left value comp)
-                  right
-                  node-value)
+                            right
+                            node-value)
                  ; set node to left
                  (tree-node new-tree-node right node-value))
              
              (if (tree-node? right) ; upper bound
                  ;  recursive add node to right
                  (tree-node left
-                  (tree-node-insert-value right value comp)
-                  node-value)
+                            (tree-node-insert-value right value comp)
+                            node-value)
                  ; set node to right
                  (tree-node left new-tree-node node-value)))]
         [else #f]))
@@ -50,15 +50,15 @@
                  (tree-node-remove-value right value comp)
                  node-value)]
                [else ; element is current tree
-                     (cond [(and l? r?) ; two children
-                            (define right-min-value (tree-node-search-min right comp))
-                            (tree-node
-                             left
-                             (tree-node-remove-value right right-min-value comp)
-                             right-min-value)]
-                           [l? left] ; child: left
-                           [r? right] ; child: right
-                           [else #f])])] ; no children
+                (cond [(and l? r?) ; two children
+                       (define right-min-value (tree-node-search-min right comp))
+                       (tree-node
+                        left
+                        (tree-node-remove-value right right-min-value comp)
+                        right-min-value)]
+                      [l? left] ; child: left
+                      [r? right] ; child: right
+                      [else #f])])] ; no children
         [else #f]))
 
 (define (tree-node-replace-value tree old-value new-value comp)
@@ -87,9 +87,9 @@
 (define (tree-node-map tree proc)
   (if (tree-node? tree)
       (tree-node
-          (tree-node-map (tree-node-left tree) proc)
-          (tree-node-map (tree-node-right tree) proc)
-          (proc (tree-node-value tree)))
+       (tree-node-map (tree-node-left tree) proc)
+       (tree-node-map (tree-node-right tree) proc)
+       (proc (tree-node-value tree)))
       #f))
 
 (define (tree-node->list tree)

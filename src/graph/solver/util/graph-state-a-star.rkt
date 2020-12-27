@@ -1,7 +1,6 @@
 #lang racket
 
 (require "../../../util/util.rkt")
-(require "../../base/base-structures.rkt")
 (require "graph-state-disco.rkt")
 
 (provide (all-defined-out)

@@ -13,9 +13,9 @@
 
 (define ffi-lib-path-pref
   (get-preference 'ffi-lib-path
-                   (lambda () #f)
-                   'timestamp
-                   (build-path (find-system-path 'pref-dir) "rge-prefs.rktd")))
+                  (lambda () #f)
+                  'timestamp
+                  (build-path (find-system-path 'pref-dir) "rge-prefs.rktd")))
 
 (define ffi-lib-path
   (cond [(and (path-string? ffi-lib-path-pref) (file-exists? ffi-lib-path-pref)) ffi-lib-path-pref]
@@ -39,10 +39,10 @@
 (define-curses graphMake
   (_fun
    [_size = (if (= (length ids)
-                  (length positions)
-                  (length connectionCounts))
-               (length ids)
-               (error "Invalid Graph"))]
+                   (length positions)
+                   (length connectionCounts))
+                (length ids)
+                (error "Invalid Graph"))]
    [ids : (_list i _uID)]
    [positions : (_list i _Vector2)]
    [connectionCounts : (_list i _size)]

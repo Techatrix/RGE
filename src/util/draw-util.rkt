@@ -1,6 +1,5 @@
 #lang racket
 
-(require "util.rkt")
 (require "structures.rkt")
 
 (provide (all-defined-out))

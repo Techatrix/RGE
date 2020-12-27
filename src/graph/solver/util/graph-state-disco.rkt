@@ -1,6 +1,5 @@
 #lang racket
 
-(require "../../base/base-structures.rkt")
 (require "graph-state.rkt")
 
 (provide (all-defined-out)

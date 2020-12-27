@@ -72,9 +72,9 @@
     (define/public (set-dark-mode?! _dark-mode?)
       (set! dark-mode? _dark-mode?)
       (send this set-canvas-background
-              (if _dark-mode?
-                  (make-object color% 25 25 25)
-                  (make-object color% 225 225 225)))
+            (if _dark-mode?
+                (make-object color% 25 25 25)
+                (make-object color% 225 225 225)))
       (refresh))
     
     (define/public (set-draw-node-ids?! _draw-node-ids?)
