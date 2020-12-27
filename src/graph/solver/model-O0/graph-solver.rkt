@@ -22,5 +22,5 @@
 (define (dijkstra graph root-node-id goal-node-id)
   (solver:dijkstra graph searcher-graph-O0 searcher-state-O0 root-node-id goal-node-id))
 
-(define (a-star graph root-node-id goal-node-id)
-  (solver:a-star graph searcher-graph-O0 searcher-state-O0 root-node-id goal-node-id))
+(define (a-star graph root-node-id goal-node-id [proc-dist vec2-dist])
+  (solver:a-star graph searcher-graph-O0 searcher-state-O0 root-node-id goal-node-id proc-dist))

@@ -11,11 +11,13 @@
   
   (check-equal? (graph-solver-dfs-sp g level id1 id2) exspect)
   (check-equal? (graph-solver-dijkstra g level id1 id2) exspect)
+  (check-equal? (graph-solver-a-star g level id1 id2) exspect)
   
   (check-equal? (graph-solver-bfs g level id3 id4) #f)
   (check-equal? (graph-solver-dfs g level id3 id4) #f)
   (check-equal? (graph-solver-dfs-sp g level id3 id4) #f)
-  (check-equal? (graph-solver-dijkstra g level id3 id4) #f))
+  (check-equal? (graph-solver-dijkstra g level id3 id4) #f)
+  (check-equal? (graph-solver-a-star g level id3 id4) #f))
 
 (define (run-test g valid-root-id valid-goal-id invalid-root-id invalid-goal-id exspect)
   (define-values (id1 id2 id3 id4)

@@ -9,32 +9,34 @@
 
 (provide a-star)
 
-(define (a-star graph searcher state-searcher root-node-id goal-node-id)
-  (define goal-node-position
-    (node-position ((searcher-get searcher) (graph-nodes graph) (node goal-node-id #f #f))))
+(define (a-star graph searcher state-searcher root-node-id goal-node-id [proc-dist vec2-dist])
+  (define goal-node ((searcher-get searcher) (graph-nodes graph) (node goal-node-id #f #f)))
+  (cond [(not goal-node) #f]
+        [else
+         (define goal-node-position (node-position goal-node))
   
-  (define h
-    (lambda (id)
-      (define pos (node-position ((searcher-get searcher) (graph-nodes graph) (node id #f #f))))
-      (vec2-dist goal-node-position pos)))
+         (define h
+           (lambda (id)
+             (define pos (node-position ((searcher-get searcher) (graph-nodes graph) (node id #f #f))))
+             (proc-dist goal-node-position pos)))
   
-  (define state
-    (graph-state-a-star-node-set-fscore
-     (graph-state-a-star-node-set-gscore
-      (graph-state-a-star-build graph searcher state-searcher)
-      root-node-id
-      0.0)
-     root-node-id
-     (h root-node-id)))
-  
-  (define node-set (list root-node-id))
-  
-  (define-values (new-state found)
-    (a-star-call graph searcher state node-set goal-node-id h))
-
-  (if found
-      (graph-state-disco->route new-state root-node-id goal-node-id)
-      #f))
+         (define state
+           (graph-state-a-star-node-set-fscore
+            (graph-state-a-star-node-set-gscore
+             (graph-state-a-star-build graph searcher state-searcher)
+             root-node-id
+             0.0)
+            root-node-id
+            (h root-node-id)))
+         
+         (define node-set (list root-node-id))
+         
+         (define-values (new-state found)
+           (a-star-call graph searcher state node-set goal-node-id h))
+         
+         (if found
+             (graph-state-disco->route new-state root-node-id goal-node-id)
+             #f)]))
 
 (define (a-star-call graph searcher state node-set goal-node-id h)
   (cond [(empty? node-set) (values state #f)]
