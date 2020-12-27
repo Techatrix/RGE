@@ -15,13 +15,12 @@ Graph *graphMake(size_t nodeCount, uID *ids, Vector2 *positions, size_t *connect
 	
 	for (size_t i = 0; i < nodeCount; i++)
 	{
-		uID& id = ids[i];
-		graph->ids[id] = i;
-		graph->positions[id] = positions[i];
+		graph->ids[i] = ids[i];
+		graph->positions[i] = positions[i];
 
 		std::vector<Connection> c(connectionCounts[i]);
 		std::copy(connections[i], connections[i] + connectionCounts[i], c.begin());
-		graph->connections[id] = std::move(c);
+		graph->connections[i] = std::move(c);
 	}
 
 	if(!std::is_sorted(graph->ids.begin(), graph->ids.end()))

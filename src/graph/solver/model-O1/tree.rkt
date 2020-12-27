@@ -66,13 +66,15 @@
   (tree-node-insert-value temp-tree new-value comp))
 
 (define (tree-node-search tree value comp)
-  (define left (tree-node-left tree))
-  (define right (tree-node-right tree))
-  (define node-value (tree-node-value tree))
-  
-  (cond [(comp value node-value) (tree-node-search left value comp) ]
-        [(comp node-value value) (tree-node-search right value comp)]
-        [else node-value]))
+  (cond [(tree-node? tree)
+         (define left (tree-node-left tree))
+         (define right (tree-node-right tree))
+         (define node-value (tree-node-value tree))
+         
+         (cond [(comp value node-value) (tree-node-search left value comp) ]
+               [(comp node-value value) (tree-node-search right value comp)]
+               [else node-value])]
+        [else #f]))
 
 (define (tree-node-search-min tree [comp <])
   (cond [(tree-node? tree)

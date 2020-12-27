@@ -54,19 +54,17 @@
 
   (define (proc state connections)
     (cond [(empty? connections) state]
-          [(not (list-search-eq node-set (connection-id (car connections))))
-           (proc state (rest connections))]
-          [else
+          [(not (graph-state-dijkstra-node-get-previous state (connection-id (car connections))))
            (define c-id (connection-id (car connections)))
            (define alt-distance (+ distance (connection-weight (car connections))))
-           (define old-distance
-             (graph-state-dijkstra-node-get-distance state c-id))
+           (define old-distance (graph-state-dijkstra-node-get-distance state c-id))
            
-           (define new-state
-             (cond [(< alt-distance old-distance)
-                    (define temp-state (graph-state-dijkstra-node-set-distance state c-id alt-distance))
-                    (graph-state-dijkstra-node-set-previous temp-state c-id id)]
-                   [else state]))
-           
-           (proc new-state (rest connections))]))
+           (proc
+            (if (< alt-distance old-distance)
+                     (graph-state-dijkstra-node-set-previous
+                      (graph-state-dijkstra-node-set-distance state c-id alt-distance) c-id id)
+                     state)
+            (rest connections))]
+          [else (proc state (rest connections))]))
+  
   (proc _state (node-connections ((searcher-get searcher) (graph-nodes graph) (node id #f #f)))))

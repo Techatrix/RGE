@@ -1,6 +1,7 @@
 #lang racket
 
 (require "graph-searcher.rkt")
+(require "../../base/base.rkt")
 (require (prefix-in solver: "../model-base/solver.rkt"))
 
 (provide bfs
@@ -21,5 +22,5 @@
 (define (dijkstra graph root-node-id goal-node-id)
   (solver:dijkstra graph searcher-graph-O1 searcher-state-O1 root-node-id goal-node-id))
 
-(define (a-star graph root-node-id goal-node-id)
-  (solver:a-star graph searcher-graph-O1 searcher-state-O1 root-node-id goal-node-id))
+(define (a-star graph root-node-id goal-node-id [proc-dist vec2-dist])
+  (solver:a-star graph searcher-graph-O1 searcher-state-O1 root-node-id goal-node-id proc-dist))
