@@ -6,18 +6,18 @@ namespace rge::solver
 	enum SolveMode
 	{
 		BFS,
+		BFS_SP,
 		DFS,
 		DFS_SP,
 		DIJKSTRA,
 		A_STAR,
 	};
 
-	static constexpr int SolveModeLength = 5;
+	static constexpr int SolveModeLength = 6;
 
 	enum SolveResponse
 	{
 		SUCCESS,
-		ERROR,
 		NO_PATH,
 		INVALID_ROOT,
 		INVALID_GOAL,
@@ -25,9 +25,11 @@ namespace rge::solver
 		INVALID_SEARCHER_MODE,
 	};
 
+	static constexpr int SolveResponseLength = 6;
+
 	struct SolveResult
 	{
 		SolveResponse response;
-		std::vector<uID> path;
+		std::optional<std::vector<uID>> path;
 	};
 } // namespace rge::solver

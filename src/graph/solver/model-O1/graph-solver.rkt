@@ -5,6 +5,7 @@
 (require (prefix-in solver: "../model-base/solver.rkt"))
 
 (provide bfs
+         bfs-sp
          dfs
          dfs-sp
          dijkstra
@@ -12,6 +13,9 @@
 
 (define (bfs graph root-node-id goal-node-id)
   (solver:bfs graph searcher-graph-O1 searcher-state-O1 root-node-id goal-node-id))
+
+(define (bfs-sp graph root-node-id goal-node-id)
+  (solver:bfs-sp graph searcher-graph-O1 searcher-state-O1 root-node-id goal-node-id))
 
 (define (dfs graph root-node-id goal-node-id)
   (solver:dfs graph searcher-graph-O1 searcher-state-O1 root-node-id goal-node-id))

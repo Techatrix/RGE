@@ -27,12 +27,6 @@
                   (list
                    (inexact->exact (connection-id connection))
                    (exact->inexact (connection-weight connection)))) connections)) nodes))
-  #|
-  (displayln ids)
-  (displayln positions)
-  (displayln connectionCounts)
-  (displayln connections)
-  |#
   
   (ffi:graphMake
    ids

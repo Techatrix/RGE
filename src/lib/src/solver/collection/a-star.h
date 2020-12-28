@@ -8,25 +8,6 @@
 
 namespace rge::solver
 {
-	namespace
-	{
-		struct VertexSetElement2
-		{
-			float gscore;
-			float fscore;
-			uID previous;
-
-			inline bool operator==(const uID &previous) { return this->previous == previous; }
-			inline bool operator!=(const uID &previous) { return !(*this == previous); }
-			inline bool operator<(const uID &previous) { return this->previous < previous; }
-			inline bool operator>(const uID &previous) { return this->previous > previous; }
-			inline bool operator<=(const uID &previous) { return !(*this > previous); }
-			inline bool operator>=(const uID &previous) { return !(*this < previous); }
-
-			inline uID &get() { return previous; }
-		};
-	} // namespace
-
 	template <searcher::SearcherMode SEARCHER_MODE>
 	SolveResult graphSolve_A_STAR(Graph &graph, uID rootNodeID, uID goalNodeID)
 	{
@@ -40,15 +21,14 @@ namespace rge::solver
 			Vector2 &pos2 = goalNodePosition;
 			float dx = (pos2.x - pos1.x);
 			float dy = (pos2.y - pos1.y);
-			return std::sqrt(dx*dx + dy*dy);
+			return std::sqrt(dx * dx + dy * dy);
 		};
 
-		std::vector<VertexSetElement2> set(graph.size());
-		std::fill(set.begin(), set.end(), VertexSetElement2{INFINITY, INFINITY, -1});
+		std::vector<AStarElement> set(graph.size(), {INFINITY, INFINITY, -1});
 
 		auto roalNodeIndex = graph.searchEntry<SEARCHER_MODE>(rootNodeID);
 		float fscore = h(roalNodeIndex);
-		set[roalNodeIndex] = VertexSetElement2{0.0f, fscore, -1};
+		set[roalNodeIndex] = AStarElement{0.0f, fscore, -1};
 
 		Q.insert(rootNodeID, fscore);
 
