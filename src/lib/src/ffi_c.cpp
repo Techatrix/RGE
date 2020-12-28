@@ -44,12 +44,15 @@ int graphSolveResultResponse(solver::SolveResult *result)
 
 size_t graphSolveResultPathSize(solver::SolveResult *result)
 {
-	return result->path.size();
+	if(result->path.has_value())
+		return result->path->size();
+	return 0;
 }
 
 void graphSolveResultPath(solver::SolveResult *result, uID *path)
 {
-	std::copy(result->path.begin(), result->path.end(), path);
+	if(result->path.has_value())
+		std::copy(result->path->begin(), result->path->end(), path);
 }
 
 const char *printGraph(Graph *graph)

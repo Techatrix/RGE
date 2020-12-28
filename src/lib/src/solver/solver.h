@@ -29,15 +29,17 @@ namespace rge::solver
 			return SolveResult{INVALID_SEARCHER_MODE};
 		if( SEARCHER_MODE == searcher::CONSTANT && !graph->hasLinearIDs())
 			return SolveResult{INVALID_SEARCHER_MODE};
-		if(!(graph->searchEntry<SEARCHER_MODE>(rootNodeID) < graph->size()))
+		if(graph->searchEntryIterator<SEARCHER_MODE>(rootNodeID) == std::end(graph->ids))
 			return SolveResult{INVALID_ROOT};
-		if(!(graph->searchEntry<SEARCHER_MODE>(rootNodeID) < graph->size()))
+		if(graph->searchEntryIterator<SEARCHER_MODE>(goalNodeID) == std::end(graph->ids))
 			return SolveResult{INVALID_GOAL};
 
 		switch (SOLVE_MODE)
 		{
 		case BFS:
 			return graphSolve_BFS<SEARCHER_MODE>(*graph, rootNodeID, goalNodeID);
+		case BFS_SP:
+			return graphSolve_BFS_SP<SEARCHER_MODE>(*graph, rootNodeID, goalNodeID);
 		case DFS:
 			return graphSolve_DFS<SEARCHER_MODE>(*graph, rootNodeID, goalNodeID);
 		case DFS_SP:

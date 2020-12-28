@@ -13,14 +13,12 @@ namespace rge::solver
 	template <searcher::SearcherMode SEARCHER_MODE>
 	SolveResult graphSolve_BFS(Graph &graph, uID rootNodeID, uID goalNodeID)
 	{
-		std::vector<DiscoElement> disco(graph.size());
-		std::fill(disco.begin(), disco.end(), DiscoElement{-1, false});
+		std::vector<DiscoElement> disco(graph.size(), {-1, false});
 
 		size_t rootNodeIndex = graph.searchEntry<SEARCHER_MODE>(rootNodeID);
 		disco[rootNodeIndex] = DiscoElement{-1, true};
 
-		std::deque<uID> Q;
-		Q.push_front(rootNodeID);
+		std::deque<uID> Q = {rootNodeID};
 
 		while (!Q.empty())
 		{

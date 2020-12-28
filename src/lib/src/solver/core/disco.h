@@ -9,7 +9,7 @@
 namespace rge::solver
 {
 	template <typename T>
-	std::vector<uID> discoParse(Graph &graph, std::vector<T> disco, uID rootNodeID, uID goalNodeID)
+	std::optional<std::vector<uID>> discoParse(Graph &graph, std::vector<T> disco, uID rootNodeID, uID goalNodeID)
 	{
 		std::vector<uID> path;
 
@@ -23,13 +23,14 @@ namespace rge::solver
 
 			currentNodeID = disco[index].get();
 
-			assert(currentNodeID >= 0);
+			if(currentNodeID < 0)
+				return std::optional<std::vector<uID>>();
 		}
 
 		path.push_back(rootNodeID);
 
 		std::reverse(path.begin(), path.end());
 
-		return std::move(path);
+		return std::make_optional(std::move(path));
 	}
 } // namespace rge::solver

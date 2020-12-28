@@ -18,4 +18,36 @@ namespace rge::solver
 
 		inline uID &get() { return id; }
 	};
+
+	struct DijkstraElement
+	{
+		float distance;
+		uID previous;
+
+		inline bool operator==(const uID &prev) { return previous == prev; }
+		inline bool operator!=(const uID &prev) { return !(*this == prev); }
+		inline bool operator<(const uID &prev) { return previous < prev; }
+		inline bool operator>(const uID &prev) { return previous > prev; }
+		inline bool operator<=(const uID &prev) { return !(*this > prev); }
+		inline bool operator>=(const uID &prev) { return !(*this < prev); }
+
+		inline uID &get() { return previous; }
+	};
+
+	struct AStarElement
+	{
+		float gscore;
+		float fscore;
+		uID previous;
+
+		inline bool operator==(const uID &prev) { return previous == prev; }
+		inline bool operator!=(const uID &prev) { return !(*this == prev); }
+		inline bool operator<(const uID &prev) { return previous < prev; }
+		inline bool operator>(const uID &prev) { return previous > prev; }
+		inline bool operator<=(const uID &prev) { return !(*this > prev); }
+		inline bool operator>=(const uID &prev) { return !(*this < prev); }
+
+		inline uID &get() { return previous; }
+	};
+
 } // namespace rge::solver

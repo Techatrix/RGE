@@ -8,6 +8,7 @@
          (prefix-in O3: "model-O3/graph-solver.rkt"))
 
 (provide graph-solver-bfs
+         graph-solver-bfs-sp
          graph-solver-dfs
          graph-solver-dfs-sp
          graph-solver-dijkstra
@@ -19,6 +20,8 @@
 
 (define (graph-solver-bfs graph level root-node-id goal-node-id)
   (graph-solver graph level root-node-id goal-node-id O0:bfs O1:bfs void O3:bfs))
+(define (graph-solver-bfs-sp graph level root-node-id goal-node-id)
+  (graph-solver graph level root-node-id goal-node-id O0:bfs-sp O1:bfs-sp void O3:bfs-sp))
 (define (graph-solver-dfs graph level root-node-id goal-node-id)
   (graph-solver graph level root-node-id goal-node-id O0:dfs O1:dfs void O3:dfs))
 (define (graph-solver-dfs-sp graph level root-node-id goal-node-id)

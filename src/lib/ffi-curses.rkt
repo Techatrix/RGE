@@ -1,7 +1,6 @@
 #lang racket
 (require ffi/unsafe
-         ffi/unsafe/define
-         racket/path)
+         ffi/unsafe/define)
 
 (provide graphMake
          graphSolve
